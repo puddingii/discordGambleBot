@@ -1,5 +1,5 @@
 /**
- * @typedef {import('./Stock').default | import('./Coin').default} stock
+ * @typedef {import('./Stock') | import('./Coin')} stock
  * @typedef {{ stock: stock, cnt: number, value: number}} userStockInfo
  * @typedef {{ code: number, message?: string }} DefaultResult
  */
@@ -33,26 +33,35 @@ module.exports = class User {
 	}
 	/**
 	 * @param {Number} money
+	 * @param {'stock' | 'coin'} type
 	 * @return {DefaultResult}
 	 */
-	updateMoney(money) {
+	updateMoney(money, type) {
 		if (this.money + money < 0) {
 			return { code: 0, message: '돈이 부족함' };
 		}
-		this.money += money;
+		let extraCommission = 1;
+		/** 주식이고 파는 경우 수수료 2%를 땐다. */
+		if (money < 0 && type === 'stock') {
+			extraCommission = 0.98;
+		}
+		this.money += money * extraCommission;
 		return { code: 1 };
 	}
 	/**
 	 * 가지고 있는 주식 업데이트 하기(사고 팔때 사용)
 	 * @param {stock} stock
-	 * @param {cnt} number
+	 * @param {number} cnt
 	 * @return {DefaultResult}
 	 */
 	updateStock(stock, cnt) {
 		const stockInfo = this.getStock(stock.name);
 		/** 예전에 사고판적이 있을 때 */
 		if (stockInfo && stockInfo.cnt + cnt >= 0) {
-			const moneyResult = this.updateMoney(cnt * stockInfo.stock.value * -1);
+			const moneyResult = this.updateMoney(
+				cnt * stockInfo.stock.value * -1,
+				stockInfo.stock.type,
+			);
 			if (!moneyResult.code) {
 				return moneyResult;
 			}

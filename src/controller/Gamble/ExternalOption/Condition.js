@@ -1,6 +1,6 @@
 module.exports = class Condition {
 	/**
-	 * @param {import('../Stock').default} stock
+	 * @param {import('../Stock')} stock
 	 */
 	constructor(stock) {
 		this.strengthList = [-0.01, 0, 0.01];

@@ -88,7 +88,7 @@ module.exports = class Gamble {
 			}
 			this.curTime++;
 			this.update();
-		}, 1000 * 1);
+		}, 1000 * 60 * 30);
 	}
 
 	/** 주식정보 갱신하기 */
@@ -98,10 +98,10 @@ module.exports = class Gamble {
 			const ratio = myStock.getRandomRatio();
 			stock.update(this.curTime, ratio, this.curCondition);
 		});
-		// this.coinList.forEach(coin => {
-		// 	const ratio = coin.getRandomRatio();
-		// 	coin.update(this.curTime, ratio);
-		// });
+		this.coinList.forEach(coin => {
+			const ratio = coin.getRandomRatio();
+			coin.update(this.curTime, ratio);
+		});
 	}
 
 	/** Gamble의 condition 조정 */
