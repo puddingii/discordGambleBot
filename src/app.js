@@ -3,7 +3,8 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 
-dotenv.config({ path: path.resolve(__dirname, '../.env') });
+const envPath = process.env.NODE_ENV === 'development' ? '../.env.local' : '../.env';
+dotenv.config({ path: path.resolve(__dirname, envPath) });
 require('./config/db');
 
 const client = new Client({

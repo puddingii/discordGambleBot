@@ -31,6 +31,13 @@
 		"document": false,
 		"window": false
 	},
+	"settings": {
+		"import/resolver": {
+			"node": {
+				"extensions": [".js", ".jsx", ".ts", ".tsx"]
+			}
+		}
+	},
 	// add your custom rules here
 	"rules": {
 		"no-underscore-dangle": "off",

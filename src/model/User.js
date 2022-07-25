@@ -38,7 +38,7 @@ const User = new mongoose.Schema({
  * @this import('mongoose').Model
  * @param {String} discordId
  */
-User.statics.findBydiscordId = async function (discordId) {
+User.statics.findByDiscordId = async function (discordId) {
 	const userInfo = await this.findOne({ discordId });
 	return userInfo;
 };

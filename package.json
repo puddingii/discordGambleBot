@@ -3,11 +3,11 @@
 	"version": "1.0.0",
 	"main": "app.js",
 	"scripts": {
-		"start": "node src/deploy-command.js && node src/app.js",
+		"start": "cross-env NODE_ENV=production node src/deploy-command.js && node src/app.js",
 		"build": "babel src -d build",
-		"dev:app": "nodemon src/app.js",
+		"dev:app": "cross-env NODE_ENV=development node src/deploy-command.js && cross-env NODE_ENV=development node src/app.js",
 		"dev:deploy": "node src/deploy-command.js",
-		"dev:classTest": "node src/controller/Game.js"
+		"dev:classTest": "cross-env NODE_ENV=development src/controller/Game.js"
 	},
 	"author": "",
 	"license": "ISC",
@@ -29,9 +29,11 @@
 		"@babel/cli": "^7.17.6",
 		"@babel/core": "^7.17.8",
 		"@babel/preset-env": "^7.16.11",
+		"cross-env": "^7.0.3",
 		"eslint": "^8.10.0",
 		"eslint-config-airbnb-base": "^15.0.0",
 		"eslint-config-prettier": "^8.5.0",
+		"eslint-plugin-import": "^2.26.0",
 		"eslint-plugin-prettier": "^4.0.0",
 		"eslint-plugin-sort-class-members": "^1.14.1",
 		"nodemon": "^2.0.15",

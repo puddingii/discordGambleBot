@@ -18,6 +18,14 @@ const Stock = new mongoose.Schema({
 		type: String,
 		default: '',
 	},
+	minRatio: {
+		type: String,
+		default: -0.5,
+	},
+	maxRatio: {
+		type: String,
+		default: 0.5,
+	},
 	updateTime: {
 		type: Number,
 		default: 4,
@@ -43,11 +51,13 @@ const Stock = new mongoose.Schema({
 /**
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
+ * @param {'stock' | 'coin' | 'all'} type
  * @param {String} discordId
  */
-Stock.statics.findBydiscordId = async function (discordId) {
-	const userInfo = await this.findOne({ discordId });
-	return userInfo;
+Stock.statics.findAllList = async function (type) {
+	const condition = type === 'all' ? {} : { type };
+	const stockList = await this.find(condition);
+	return stockList;
 };
 
 /**
@@ -80,50 +90,6 @@ Stock.statics.addChannel = async function (userInfo, channelInfo) {
 	await user.save();
 
 	return 1;
-};
-
-/** 유저정보에 공부정보 추가 */
-Stock.statics.addStudy = async function (discordId, studyInfo) {
-	const user = await this.findOne({ discordId }).populate('studyList');
-	if (!user) {
-		throw new Error('User is not found.');
-	}
-
-	user.studyList.push(studyInfo);
-	await user.save();
-
-	return 1;
-};
-
-/** 유저정보에 Todo정보 추가 */
-Stock.statics.addTodo = async function (discordId, todoInfo) {
-	const user = await this.findOne({ discordId }).populate('todoList');
-	if (!user) {
-		throw new Error('User is not found.');
-	}
-
-	user.todoList.push(todoInfo);
-	await user.save();
-
-	return 1;
-};
-
-/**
- * Random id 생성 후 저장 및 return
- * @this import('mongoose').Model
- * @param {String} discordId
- */
-Stock.statics.getRandomId = async function (discordId) {
-	const user = await this.findOne({ discordId });
-	if (!user) {
-		throw new Error('User is not found.');
-	}
-
-	const randomString = Math.random().toString(36).slice(2);
-	user.accessKey = randomString;
-	await user.save();
-
-	return randomString;
 };
 
 module.exports = mongoose.model('Stock', Stock);
