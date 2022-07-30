@@ -7,7 +7,7 @@
 		"build": "babel src -d build",
 		"dev:app": "cross-env NODE_ENV=development node src/deploy-command.js && cross-env NODE_ENV=development node src/app.js",
 		"dev:deploy": "node src/deploy-command.js",
-		"dev:classTest": "cross-env NODE_ENV=development src/controller/Game.js"
+		"dev:classTest": "node src/controller/Game.js"
 	},
 	"author": "",
 	"license": "ISC",

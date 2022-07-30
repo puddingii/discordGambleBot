@@ -4,13 +4,13 @@ const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
 const {
-	cradle: { logger },
+	cradle: { logger, secretKey },
 } = require('./config/dependencyInjection');
 
 dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 (function () {
-	if (!process.env.BOT_TOKEN || !process.env.CLIENT_ID || !process.env.GUILD_ID) {
+	if (!secretKey.botToken || !secretKey.clientId || !secretKey.guildId) {
 		logger.error('Required Env variables is not defined.');
 		return;
 	}
@@ -42,27 +42,24 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 	});
 
 	/** Apply commands */
-	const rest = new REST({ version: '9' }).setToken(process.env.BOT_TOKEN);
-	if (process.env.NODE_ENV !== 'production') {
+	const rest = new REST({ version: '9' }).setToken(secretKey.botToken);
+	if (secretKey.nodeEnv !== 'production') {
 		rest
-			.put(Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID), {
+			.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId), {
 				body: commands,
 			})
 			.then(() => logger.info('Successfully registered application commands.'))
 			.catch(err => logger.error(err));
 		rest
-			.put(
-				Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID2),
-				{
-					body: commands,
-				},
-			)
+			.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId2), {
+				body: commands,
+			})
 			.then(() => logger.info('Successfully registered application commands.'))
 			.catch(err => logger.error(err));
 	} else {
 		/** Global apply => After 1 hour. */
 		rest
-			.put(Routes.applicationCommands(process.env.CLIENT_ID), { body: commands })
+			.put(Routes.applicationCommands(secretKey.clientId), { body: commands })
 			.then(() => logger.info('Successfully registered global application commands.'))
 			.catch(err => logger.error(err));
 	}
