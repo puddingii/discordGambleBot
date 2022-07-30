@@ -7,18 +7,21 @@ const {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('stocktype')
-		.setDescription('주식리스트임')
+		.setName('주식리스트')
+		.setDescription('주식리스트임. 옵션이 없으면 기본으로 전체가 뜸.')
 		.addStringOption(option =>
 			option
-				.setName('타입')
+				.setName('stocktype')
 				.setDescription('주식인지 코인인지')
 				.addChoice('주식', 'stock')
 				.addChoice('코인', 'coin')
 				.addChoice('전체', 'all'),
 		),
-	/** @param {import('discord.js').CommandInteraction} interaction */
-	async execute(interaction) {
+	/**
+	 * @param {import('discord.js').CommandInteraction} interaction
+	 * @param {import('../../controller/Game')} game
+	 */
+	async execute(interaction, game) {
 		try {
 			/** Discord Info */
 			const stockType = interaction.options.getString('stocktype') || 'all';

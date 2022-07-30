@@ -5,8 +5,11 @@ const { isEnrolledUser } = require('../config/middleware');
 
 module.exports = {
 	name: 'interactionCreate',
-	/** @param {import('discord.js').CommandInteraction} interaction */
-	async execute(interaction) {
+	/**
+	 * @param {import('discord.js').CommandInteraction} interaction
+	 * @param {import('../controller/Game')} game
+	 */
+	async execute(interaction, game) {
 		const {
 			commandName,
 			user: { username },
@@ -20,17 +23,17 @@ module.exports = {
 		if (!command) {
 			return;
 		}
-		const notCheckCommandList = ['init', 'enrolluser', 'createuser'];
+		const notCheckCommandList = ['유저등록'];
 		if (!notCheckCommandList.includes(commandName)) {
 			const isExist = await isEnrolledUser(interaction);
 			if (!isExist) {
-				await interaction.reply('You are not enrolled this server.');
+				await interaction.reply('유저정보가 없습니다. 유저등록부터 해주세요');
 				return;
 			}
 		}
 
 		try {
-			await command.execute(interaction);
+			await command.execute(interaction, game);
 			logger.info(`[interactionCreate]${username} - ${commandName}`);
 		} catch (error) {
 			logger.error(error);

@@ -1,47 +1,66 @@
 const mongoose = require('mongoose');
 
+const historySchema = new mongoose.Schema({
+	value: {
+		type: Number,
+		required: true,
+	},
+	date: {
+		type: Date,
+		default: Date.now,
+	},
+});
+
 const Stock = new mongoose.Schema({
+	/** 이름 */
 	name: {
 		type: String,
 		unique: true,
 		required: true,
 	},
+	/** 타입 (코인 or 주식) */
 	type: {
 		type: String,
 		default: 'stock',
 	},
+	/** 1개당 가격 */
 	value: {
 		type: Number,
 		default: 1000000,
 	},
+	/** 설명 */
 	comment: {
 		type: String,
 		default: '',
 	},
+	/** 변동률 최소치 */
 	minRatio: {
 		type: String,
-		default: -0.5,
+		default: -0.05,
 	},
+	/** 변동률 최대치 */
 	maxRatio: {
 		type: String,
-		default: 0.5,
+		default: 0.05,
 	},
+	/** 업데이트 주기. 모든 코인, 주식 동일하게 2시간마다 */
 	updateTime: {
 		type: Number,
 		default: 4,
 	},
+	/** 조정주기 업데이트주기*cnt 시간(ex 업데이트 주기 2시간*4 = 8시간마다 조정) */
 	correctionCnt: {
 		type: Number,
 		default: 4,
 	},
-	correctionHistory: {
-		type: Array,
-		default: [],
-	},
+	/** 주식 히스토리 */
+	updHistory: [historySchema],
+	/** 환경에 영향을 받는정도 순서대로 [아무일없음,씹악재, 악재, 호재, 씹호재] */
 	conditionList: {
 		type: Array,
 		default: [0, -0.06, -0.04, 0.04, 0.06],
 	},
+	/** 배당 주식에만 해당함 */
 	dividend: {
 		type: Number,
 		default: 0.005,
@@ -58,6 +77,21 @@ Stock.statics.findAllList = async function (type) {
 	const condition = type === 'all' ? {} : { type };
 	const stockList = await this.find(condition);
 	return stockList;
+};
+
+/**
+ * 아이디로 유저정보 탐색
+ * @this import('mongoose').Model
+ * @param {'stock' | 'coin' | 'all'} type
+ * @param {String} discordId
+ */
+Stock.statics.addStock = async function (stockInfo) {
+	const isExist = await this.exists({ name: stockInfo.name });
+	if (isExist) {
+		return { code: 0, msg: '이미 있는 회원입니다.' };
+	}
+	await this.create(stockInfo);
+	return { code: 1 };
 };
 
 /**

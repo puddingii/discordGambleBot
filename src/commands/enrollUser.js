@@ -10,8 +10,11 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('nickname').setDescription('닉네임').setRequired(true),
 		),
-	/** @param {import('discord.js').CommandInteraction} interaction */
-	async execute(interaction) {
+	/**
+	 * @param {import('discord.js').CommandInteraction} interaction
+	 * @param {import('../controller/Game')} game
+	 */
+	async execute(interaction, game) {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();

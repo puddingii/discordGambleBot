@@ -29,9 +29,9 @@ module.exports = class Gamble {
 			stockInfo => stockInfo.name === stock.name,
 		);
 		if (isExistUser) {
-			return { code: 0, message: '이미 있는 유저입니다.' };
+			return { code: 0, message: '이미 있는 주식입니다.' };
 		}
-		this.userList.push(user);
+		this[`${stock.type}List`].push(user);
 		return { code: 1 };
 	}
 
