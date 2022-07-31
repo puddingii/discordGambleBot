@@ -7,7 +7,10 @@ const botLoader = require('./bot');
  * @param {import('discord.js').Client} app.client
  */
 module.exports = async ({ client }) => {
-	await dbLoader();
-	const game = gameLoader();
+	const dbResult = await dbLoader();
+	if (!dbResult.code) {
+		return;
+	}
+	const game = await gameLoader();
 	botLoader(client, game);
 };

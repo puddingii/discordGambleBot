@@ -2,6 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
 	cradle: { StockModel, logger, secretKey },
 } = require('../../config/dependencyInjection');
+const Stock = require('../../controller/Gamble/Stock');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -39,7 +40,7 @@ module.exports = {
 		.addStringOption(option =>
 			option
 				.setName('conditionlist')
-				.setDescription('조정퍼센트 (0.01/-0.06/-0.05/0.03/0.06)')
+				.setDescription('컨디션퍼센트 (0.01/-0.06/-0.05/0.03/0.06)')
 				.setRequired(true),
 		)
 		.addNumberOption(option =>
@@ -74,7 +75,7 @@ module.exports = {
 				return;
 			}
 
-			conditionList = conditionList.split('/').map(value => parseInt(value, 10));
+			conditionList = conditionList.split('/').map(value => parseFloat(value, 10));
 			if (conditionList.length !== 5) {
 				await interaction.reply({
 					content: '조정 퍼센트 입력형식이 이상합니다. 다시 입력해주세요.',
@@ -98,8 +99,7 @@ module.exports = {
 				return;
 			}
 
-			/** DB Info */
-			const result = await StockModel.addStock({
+			const param = {
 				name,
 				type,
 				value,
@@ -109,9 +109,20 @@ module.exports = {
 				correctionCnt,
 				conditionList,
 				dividend,
-			});
+			};
+			/** DB Info */
+			const result = await StockModel.addStock(param);
 
 			const content = result.code === 1 ? '등록완료!' : result.msg;
+			if (result.code) {
+				const classParam = {
+					ratio: { min: param.minRatio, max: param.maxRatio },
+					...param,
+					updateTime: secretKey.stockUpdateTime,
+				};
+				const stock = type === 'stock' ? new Stock(classParam) : new Coin(classParam);
+				game.addGambleStock(stock);
+			}
 
 			await interaction.reply({ content });
 		} catch (err) {

@@ -13,7 +13,7 @@ module.exports = class StockAbstract {
 	 * @param {number} stockInfo.updateTime
 	 * @param {number} stockInfo.correctionCnt
 	 */
-	constructor({ ratio, name, value, type, updateTime, correctionCnt }) {
+	constructor({ ratio, name, value, type, updateTime, correctionCnt, comment }) {
 		this.#ratio = ratio;
 		this.name = name;
 		this.value = value;
@@ -21,6 +21,7 @@ module.exports = class StockAbstract {
 		this.updateTime = updateTime;
 		this.correctionCnt = correctionCnt ?? 4;
 		this.correctionHistory = [];
+		this.comment = comment;
 	}
 
 	/**

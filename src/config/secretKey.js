@@ -14,4 +14,5 @@ module.exports = {
 	guildId: process.env.GUILD_ID,
 	guildId2: process.env.GUILD_ID2,
 	adminPw: process.env.ADMIN_PW,
+	stockUpdateTime: parseInt(process.env.STOCK_UPDATE_TIME, 10),
 };

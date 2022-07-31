@@ -12,7 +12,9 @@ module.exports = async () => {
 				: `mongodb+srv://${secretKey.mongoId}:${secretKey.mongoPw}@selfmanagebotcluster.mvecp.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;
 		await mongoose.connect(dbConnctionURL);
 		logger.info('[DB] Connected to MongoDB');
+		return { code: 1 };
 	} catch (err) {
 		logger.error(err);
+		return { code: 0, msg: err };
 	}
 };

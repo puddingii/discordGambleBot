@@ -34,6 +34,7 @@ module.exports = {
 				.setTimestamp();
 
 			/** DB Info */
+			// FIXME 모델말고 Game class 로 바꿀 예정
 			const stockList = await StockModel.findAllList(stockType);
 			stockList.forEach(stock => {
 				embedBox.addField(

@@ -1,7 +1,3 @@
-const Gamble = require('./Gamble/Gamble');
-const Stock = require('./Gamble/Stock');
-const User = require('./Gamble/User');
-
 /**
  * @typedef {import('./Gamble/Coin')} Coin
  * @typedef {import('./Gamble/Stock')} Stock
@@ -16,7 +12,7 @@ module.exports = class Game {
 	}
 
 	/**
-	 * 유저 추가
+	 * 주식 추가
 	 * @param {Stock | Coin} stock
 	 */
 	addGambleStock(stock) {

@@ -8,6 +8,11 @@ const Condition = require('./ExternalOption/Condition');
  */
 
 module.exports = class Gamble {
+	/**
+	 * @param {User[]} userList
+	 * @param {Coin[]} coinList
+	 * @param {Stock[]} stockList
+	 */
 	constructor(userList, coinList, stockList) {
 		/** @type {Array<Coin>} */
 		this.coinList = coinList ?? [];
@@ -25,13 +30,13 @@ module.exports = class Gamble {
 	 * @return {DefaultResult}
 	 */
 	addStock(stock) {
-		const isExistUser = this[`${stock.type}List`].find(
+		const isExistStock = this[`${stock.type}List`].find(
 			stockInfo => stockInfo.name === stock.name,
 		);
-		if (isExistUser) {
+		if (isExistStock) {
 			return { code: 0, message: '이미 있는 주식입니다.' };
 		}
-		this[`${stock.type}List`].push(user);
+		this[`${stock.type}List`].push(stock);
 		return { code: 1 };
 	}
 
