@@ -42,7 +42,7 @@ module.exports = class User {
 		}
 		let extraCommission = 1;
 		/** 주식이고 파는 경우 수수료 2%를 땐다. */
-		if (money < 0 && type === 'stock') {
+		if (money > 0 && type === 'stock') {
 			extraCommission = 0.98;
 		}
 		this.money += money * extraCommission;
@@ -51,35 +51,44 @@ module.exports = class User {
 	/**
 	 * 가지고 있는 주식 업데이트 하기(사고 팔때 사용)
 	 * @param {stock} stock
-	 * @param {number} cnt
+	 * @param {number} cnt isFull이 true인 경우 매수는 양수값 매도는 음수값을 넣어줘야함
+	 * @param {boolean} isFull
 	 * @return {DefaultResult}
 	 */
-	updateStock(stock, cnt) {
-		const stockInfo = this.getStock(stock.name);
-		/** 예전에 사고판적이 있을 때 */
-		if (stockInfo && stockInfo.cnt + cnt >= 0) {
-			const moneyResult = this.updateMoney(
-				cnt * stockInfo.stock.value * -1,
-				stockInfo.stock.type,
-			);
-			if (!moneyResult.code) {
-				return moneyResult;
-			}
-			const totalValue = stockInfo.cnt * stockInfo.value + cnt * stockInfo.stock.value;
-			const average = totalValue / (stockInfo.cnt + cnt);
-			stockInfo.value = average;
-			stockInfo.cnt += cnt;
-			return { code: 1 };
+	updateStock(stock, cnt, isFull) {
+		const myStock = this.getStock(stock.name);
+		if (isFull) {
+			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : myStock.cnt * -1;
 		}
-		/** 처음 살 때 */
-		if (!stockInfo && cnt > 0) {
-			this.stockList.push({ stock, cnt, value });
-			return { code: 1 };
+		if (!cnt) {
+			return { code: 0, message: '돈이 부족하거나 갯수 입력값이 잘못됨.' };
 		}
 		/** 파는데 숫자가 잘못될 경우 */
-		if (stockInfo && stockInfo.cnt + cnt < 0) {
+		if (myStock && myStock.cnt + cnt < 0) {
 			return { code: 0, message: '가지고있는 갯수보다 많이 입력함.' };
 		}
+
+		const totalMoney = cnt * stock.value;
+		const updateResult = this.updateMoney(totalMoney * -1, stock.type);
+		if (!updateResult.code) {
+			return updateResult;
+		}
+		/** 예전에 사고판적이 있을 때 */
+		if (myStock) {
+			const averageValue = Math.floor(
+				(myStock.cnt * myStock.value + totalMoney) / (myStock.cnt + cnt),
+			);
+			myStock.value = averageValue;
+			myStock.cnt += cnt;
+			return { code: 1 };
+		}
+
+		/** 처음 살 때 */
+		if (!myStock) {
+			this.stockList.push({ stock, cnt, value: stock.value });
+			return { code: 1 };
+		}
+
 		return { code: 0, message: '없는 주식이거나 숫자 잘못 입력함' };
 	}
 };

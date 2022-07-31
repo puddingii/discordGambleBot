@@ -56,20 +56,38 @@ module.exports = class Gamble {
 	/**
 	 * @param {string} userId 디스코드 아이디
 	 * @param {string} stockName 주식 이름
-	 * @param {number} cnt 팔고살 주식 갯수
+	 * @param {number} cnt 팔고살 주식 갯수, 파는거면 마이너스값
+	 * @param {boolean} isFull
 	 * @returns {DefaultResult}
 	 */
-	buySellStock(userId, stockName, cnt) {
+	buySellStock(userId, stockName, cnt, isFull) {
 		const userInfo = this.userList.find(user => user.getId() === userId);
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}
-		const stockInfo = this.stockList.find(stock => stock.name === stockName);
+		const stockInfo = this.stockList
+			.concat(this.coinList)
+			.find(stock => stock.name === stockName);
 		if (!stockInfo) {
 			return { code: 0, message: '주식/코인정보가 없습니다' };
 		}
-		const stockResult = userInfo.updateStock(stockInfo, cnt);
+		const stockResult = userInfo.updateStock(stockInfo, cnt, isFull);
 		return stockResult;
+	}
+
+	/**
+	 * 주식/코인 리스트에서 name에 해당하는 정보 가져오기
+	 * @param {'stock' | 'coin'| 'all'} type
+	 */
+	getAllStock(type) {
+		switch (type) {
+			case 'coin':
+				return this.coinList;
+			case 'stock':
+				return this.stockList;
+			default:
+				return this.stockList.concat(this.coinList);
+		}
 	}
 
 	/**
