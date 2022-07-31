@@ -10,21 +10,6 @@ module.exports = class Game {
 	constructor(gamble) {
 		this.gamble = gamble;
 	}
-
-	/**
-	 * 주식 추가
-	 * @param {Stock | Coin} stock
-	 */
-	addGambleStock(stock) {
-		return this.gamble.addStock(stock);
-	}
-	/**
-	 * 주식/코인 추가
-	 * @param {User} user
-	 */
-	addGambleUser(user) {
-		return this.gamble.addUser(user);
-	}
 };
 
 // const user1 = new User({ id: 'gun4930' });

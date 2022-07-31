@@ -2,7 +2,7 @@ const { SlashCommandBuilder } = require('@discordjs/builders');
 const { MessageEmbed } = require('discord.js');
 const dayjs = require('dayjs');
 const {
-	cradle: { StockModel, logger, util },
+	cradle: { logger, util },
 } = require('../../config/dependencyInjection');
 
 module.exports = {
@@ -11,7 +11,7 @@ module.exports = {
 		.setDescription('주식리스트임. 옵션이 없으면 기본으로 전체가 뜸.')
 		.addStringOption(option =>
 			option
-				.setName('stocktype')
+				.setName('종류')
 				.setDescription('주식인지 코인인지')
 				.addChoice('주식', 'stock')
 				.addChoice('코인', 'coin')
@@ -24,7 +24,7 @@ module.exports = {
 	async execute(interaction, game) {
 		try {
 			/** Discord Info */
-			const stockType = interaction.options.getString('stocktype') || 'all';
+			const stockType = interaction.options.getString('종류') || 'all';
 			const embedBox = new MessageEmbed();
 			embedBox
 				.setColor('#0099ff')
@@ -34,11 +34,12 @@ module.exports = {
 				.setTimestamp();
 
 			/** DB Info */
-			// FIXME 모델말고 Game class 로 바꿀 예정
-			const stockList = await StockModel.findAllList(stockType);
+			const stockList = game.gamble.getAllStock(stockType);
 			stockList.forEach(stock => {
 				embedBox.addField(
-					`${stock.name} - ${util.setComma(stock.value)}원`,
+					`${stock.name} ${stock.type === 'stock' ? '주식' : '코인'} - ${util.setComma(
+						stock.value,
+					)}원`,
 					stock.comment,
 				);
 			});

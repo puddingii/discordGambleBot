@@ -15,6 +15,6 @@ module.exports = async () => {
 		return { code: 1 };
 	} catch (err) {
 		logger.error(err);
-		return { code: 0, msg: err };
+		return { code: 0, message: err };
 	}
 };

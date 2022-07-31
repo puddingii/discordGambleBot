@@ -89,7 +89,7 @@ Stock.statics.findAllList = async function (type) {
 Stock.statics.addStock = async function (stockInfo) {
 	const isExist = await this.exists({ name: stockInfo.name });
 	if (isExist) {
-		return { code: 0, msg: '이미 있는 회원입니다.' };
+		return { code: 0, message: '같은 이름이 있습니다.' };
 	}
 	await this.create(stockInfo);
 	return { code: 1 };
