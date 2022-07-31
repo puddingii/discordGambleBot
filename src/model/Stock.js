@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const secretKey = require('../config/secretKey');
 
 const historySchema = new mongoose.Schema({
 	value: {
@@ -46,7 +47,7 @@ const Stock = new mongoose.Schema({
 	/** 업데이트 주기. 모든 코인, 주식 동일하게 2시간마다 */
 	updateTime: {
 		type: Number,
-		default: 4,
+		default: secretKey.stockUpdateTime,
 	},
 	/** 조정주기 업데이트주기*cnt 시간(ex 업데이트 주기 2시간*4 = 8시간마다 조정) */
 	correctionCnt: {
