@@ -58,13 +58,13 @@ module.exports = class User {
 	updateStock(stock, cnt, isFull) {
 		const myStock = this.getStock(stock.name);
 		if (isFull) {
-			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : myStock.cnt * -1;
+			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : myStock?.cnt ?? 0 * -1;
 		}
 		if (!cnt) {
 			return { code: 0, message: '돈이 부족하거나 갯수 입력값이 잘못됨.' };
 		}
 		/** 파는데 숫자가 잘못될 경우 */
-		if (myStock && myStock.cnt + cnt < 0) {
+		if ((myStock && myStock.cnt + cnt < 0) || (!myStock && cnt < 0)) {
 			return { code: 0, message: '가지고있는 갯수보다 많이 입력함.' };
 		}
 
@@ -78,7 +78,7 @@ module.exports = class User {
 			const averageValue = Math.floor(
 				(myStock.cnt * myStock.value + totalMoney) / (myStock.cnt + cnt),
 			);
-			myStock.value = averageValue;
+			myStock.value = myStock.cnt + cnt !== 0 ? averageValue : 0;
 			myStock.cnt += cnt;
 			return { code: 1 };
 		}

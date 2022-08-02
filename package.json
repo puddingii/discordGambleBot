@@ -6,7 +6,8 @@
 		"start": "cross-env NODE_ENV=production node src/deploy-command.js && node src/app.js",
 		"build": "babel src -d build",
 		"dev:app": "cross-env NODE_ENV=development node src/deploy-command.js && cross-env NODE_ENV=development node src/app.js",
-		"dev:deploy": "node src/deploy-command.js",
+		"dev:deploy": "cross-env NODE_ENV=development node src/deploy-command.js",
+		"dev:server": "cross-env NODE_ENV=development node src/app.js",
 		"dev:classTest": "node src/controller/Game.js"
 	},
 	"author": "",
