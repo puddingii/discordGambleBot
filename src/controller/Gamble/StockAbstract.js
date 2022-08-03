@@ -22,6 +22,7 @@ module.exports = class StockAbstract {
 		this.correctionCnt = correctionCnt ?? 4;
 		this.correctionHistory = [];
 		this.comment = comment;
+		this.beforeHistoryRatio = 0;
 	}
 
 	/**

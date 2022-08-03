@@ -13,8 +13,9 @@ module.exports = class Stock extends StockAbstract {
 			return;
 		}
 		const updRatio = ratio + this.conditionList[curCondition];
-
-		this.value *= 1 + updRatio + this.calcCorrect();
+		const correctRatio = updRatio + this.calcCorrect();
+		this.value *= 1 + correctRatio;
+		this.beforeHistoryRatio = correctRatio;
 		this.addCorrectionHistory(this.value, updRatio);
 	}
 };

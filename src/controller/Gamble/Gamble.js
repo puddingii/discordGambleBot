@@ -1,4 +1,6 @@
+const _ = require('lodash');
 const Condition = require('./ExternalOption/Condition');
+const User = require('./User');
 
 /**
  * @typedef {import('./Coin')} Coin
@@ -41,14 +43,15 @@ module.exports = class Gamble {
 	}
 
 	/**
-	 * @param {User} user
+	 * @param {{ id: string, nickname: string }} myInfo
 	 * @return {DefaultResult}
 	 */
-	addUser(user) {
-		const isExistUser = this.userList.find(userInfo => userInfo.getId() === user.getId());
+	addUser(myInfo) {
+		const isExistUser = this.userList.find(userInfo => userInfo.getId() === myInfo.id);
 		if (isExistUser) {
 			return { code: 0, message: '이미 있는 유저입니다.' };
 		}
+		const user = new User(myInfo);
 		this.userList.push(user);
 		return { code: 1 };
 	}
@@ -78,6 +81,7 @@ module.exports = class Gamble {
 	/**
 	 * 주식/코인 리스트에서 name에 해당하는 정보 가져오기
 	 * @param {'stock' | 'coin'| 'all'} type
+	 * @return {Coin[] | Stock[]}
 	 */
 	getAllStock(type) {
 		switch (type) {
@@ -88,6 +92,33 @@ module.exports = class Gamble {
 			default:
 				return this.stockList.concat(this.coinList);
 		}
+	}
+
+	/**
+	 * 내가 가지고 있는 주식리스트
+	 * @param {string} id
+	 */
+	getMyStock(id) {
+		const user = this.userList.find(userInfo => userInfo.getId() === id);
+		if (!user) {
+			return { code: 1, message: '유저정보를 찾을 수 없습니다.' };
+		}
+
+		const stockList = user.stockList.reduce((acc, myStock) => {
+			if (myStock.cnt > 0) {
+				const ratio = _.round((myStock.stock.value / myStock.value) * 100, 2);
+				acc.push({
+					name: myStock.stock.name,
+					ratio,
+					myValue: myStock.value,
+					stockValue: myStock.stock.value,
+					stockBeforeRatio: myStock.stock.beforeHistoryRatio,
+				});
+			}
+			return acc;
+		}, []);
+
+		return stockList;
 	}
 
 	/**

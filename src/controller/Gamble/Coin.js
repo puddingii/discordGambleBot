@@ -6,6 +6,7 @@ module.exports = class Coin extends StockAbstract {
 			return;
 		}
 
+		this.beforeHistoryRatio = ratio;
 		this.value *= 1 + ratio;
 	}
 };
