@@ -24,9 +24,9 @@ module.exports = {
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름');
 			const isFull = interaction.options.getBoolean('풀매수');
-			const cnt = isFull ? 1 : interaction.options.getNumber('수량');
+			const cnt = isFull ? 1 : Math.floor(interaction.options.getNumber('수량'));
 
-			if (!isFull && cnt < 0) {
+			if (!isFull && cnt < 1) {
 				await interaction.reply({ content: '갯수를 입력해주세요' });
 				return;
 			}
@@ -39,6 +39,8 @@ module.exports = {
 			const dbResult = await UserModel.updateStock(discordId, {
 				name,
 				cnt: gambleResult.cnt,
+				value: gambleResult.value,
+				money: gambleResult.money,
 			});
 			if (!dbResult.code) {
 				await interaction.reply({ content: dbResult.message });

@@ -53,12 +53,12 @@ module.exports = class User {
 	 * @param {stock} stock
 	 * @param {number} cnt isFull이 true인 경우 매수는 양수값 매도는 음수값을 넣어줘야함
 	 * @param {boolean} isFull
-	 * @return {DefaultResult}
+	 * @return {DefaultResult & { cnt?: number, value?: number, money?: number }}
 	 */
 	updateStock(stock, cnt, isFull) {
 		const myStock = this.getStock(stock.name);
 		if (isFull) {
-			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : myStock?.cnt ?? 0 * -1;
+			cnt = cnt > 0 ? Math.floor(this.money / stock.value) : (myStock?.cnt ?? 0) * -1;
 		}
 		if (!cnt) {
 			return { code: 0, message: '돈이 부족하거나 갯수 입력값이 잘못됨.' };
@@ -74,17 +74,22 @@ module.exports = class User {
 			return updateResult;
 		}
 		/** 예전에 사고판적이 있을 때 */
+		let averageValue = 0;
+		let totalCnt = cnt;
 		if (myStock) {
-			const averageValue = Math.floor(
+			averageValue = Math.floor(
 				(myStock.cnt * myStock.value + totalMoney) / (myStock.cnt + cnt),
 			);
-			myStock.value = myStock.cnt + cnt !== 0 ? averageValue : 0;
+			averageValue = myStock.cnt + cnt !== 0 ? averageValue : 0;
+			totalCnt += myStock.cnt;
+			myStock.value = averageValue;
 			myStock.cnt += cnt;
 		} else {
 			/** 처음 살 때 */
-			this.stockList.push({ stock, cnt, value: stock.value });
+			averageValue = stock.value;
+			this.stockList.push({ stock, cnt, value: averageValue });
 		}
 
-		return { code: 1, cnt };
+		return { code: 1, cnt: totalCnt, value: averageValue, money: this.money };
 	}
 };

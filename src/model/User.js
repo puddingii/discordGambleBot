@@ -48,7 +48,7 @@ User.statics.findByDiscordId = async function (discordId) {
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
  * @param {string} discordId
- * @param {{ name: string, cnt: string }} updStockInfo
+ * @param {{ name: string, cnt: string, value: number, money: number }} updStockInfo
  */
 User.statics.updateStock = async function (discordId, updStockInfo) {
 	const userInfo = await this.findOne({ discordId }).populate('stockList.stock');
@@ -61,12 +61,8 @@ User.statics.updateStock = async function (discordId, updStockInfo) {
 	});
 
 	if (myStock) {
-		const averageValue = Math.floor(
-			(updStockInfo.cnt * myStock.stock.value + myStock.cnt * myStock.value) /
-				(myStock.cnt + updStockInfo.cnt),
-		);
-		myStock.value = myStock.cnt + updStockInfo.cnt !== 0 ? averageValue : 0;
-		myStock.cnt += updStockInfo.cnt;
+		myStock.value = updStockInfo.value;
+		myStock.cnt = updStockInfo.cnt;
 	} else {
 		const stock = await StockModel.findByName(updStockInfo.name);
 		if (!stock) {
@@ -74,10 +70,11 @@ User.statics.updateStock = async function (discordId, updStockInfo) {
 		}
 		userInfo.stockList.push({
 			stock,
-			value: stock.value,
+			value: updStockInfo.value,
 			cnt: updStockInfo.cnt,
 		});
 	}
+	userInfo.money = updStockInfo.money;
 
 	await userInfo.save();
 	return { code: 1 };

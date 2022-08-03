@@ -58,7 +58,7 @@ module.exports = class Gamble {
 	 * @param {string} stockName 주식 이름
 	 * @param {number} cnt 팔고살 주식 갯수, 파는거면 마이너스값
 	 * @param {boolean} isFull
-	 * @returns {DefaultResult & { cnt?: number }}
+	 * @returns {DefaultResult & { cnt?: number, value?: number, money?: number }}
 	 */
 	buySellStock(userId, stockName, cnt, isFull) {
 		const userInfo = this.userList.find(user => user.getId() === userId);

@@ -32,14 +32,16 @@ module.exports = async () => {
 	let userList = await UserModel.find({}).populate('stockList.stock');
 	userList = userList.map(user => {
 		/** stock정보에 해당하는 class 불러와서 init */
-		const stockList = user.stockList.reduce((acc, stockInfo) => {
+		const myList = user.stockList.reduce((acc, stockInfo) => {
 			const {
 				stock: { type, name },
+				cnt,
+				value,
 			} = stockInfo;
 			const list = type === 'stock' ? stockList : coinList;
 			const stock = list.find(stock => stock.name === name);
 			if (stock) {
-				acc.push({ stock, cnt: user.cnt, value: user.value });
+				acc.push({ stock, cnt, value });
 			}
 			return acc;
 		}, []);
@@ -47,7 +49,7 @@ module.exports = async () => {
 			id: user.discordId,
 			nickname: user.nickname,
 			money: user.money,
-			stockList,
+			stockList: myList,
 		});
 	});
 
