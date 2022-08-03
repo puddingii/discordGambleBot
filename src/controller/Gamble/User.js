@@ -80,15 +80,11 @@ module.exports = class User {
 			);
 			myStock.value = myStock.cnt + cnt !== 0 ? averageValue : 0;
 			myStock.cnt += cnt;
-			return { code: 1 };
-		}
-
-		/** 처음 살 때 */
-		if (!myStock) {
+		} else {
+			/** 처음 살 때 */
 			this.stockList.push({ stock, cnt, value: stock.value });
-			return { code: 1 };
 		}
 
-		return { code: 0, message: '없는 주식이거나 숫자 잘못 입력함' };
+		return { code: 1, cnt };
 	}
 };

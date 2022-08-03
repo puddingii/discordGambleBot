@@ -72,7 +72,7 @@ const Stock = new mongoose.Schema({
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
  * @param {'stock' | 'coin' | 'all'} type
- * @param {String} discordId
+ * @param {string} discordId
  */
 Stock.statics.findAllList = async function (type) {
 	const condition = type === 'all' ? {} : { type };
@@ -84,7 +84,7 @@ Stock.statics.findAllList = async function (type) {
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
  * @param {'stock' | 'coin' | 'all'} type
- * @param {String} discordId
+ * @param {string} discordId
  */
 Stock.statics.addStock = async function (stockInfo) {
 	const isExist = await this.exists({ name: stockInfo.name });
@@ -93,6 +93,16 @@ Stock.statics.addStock = async function (stockInfo) {
 	}
 	await this.create(stockInfo);
 	return { code: 1 };
+};
+
+/**
+ * 아이디로 유저정보 탐색
+ * @this import('mongoose').Model
+ * @param {string} name
+ */
+Stock.statics.findByName = async function (name) {
+	const stockInfo = await this.findOne({ name });
+	return stockInfo;
 };
 
 /**

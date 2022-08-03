@@ -1,9 +1,7 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
-	cradle: { StockModel, logger, secretKey },
+	cradle: { UserModel, logger },
 } = require('../../config/dependencyInjection');
-const Stock = require('../../controller/Gamble/Stock');
-const Coin = require('../../controller/Gamble/Coin');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -33,10 +31,21 @@ module.exports = {
 				return;
 			}
 
-			const result = game.gamble.buySellStock(discordId, name, cnt, isFull);
-			const content = result.code ? '구매완료' : result.message;
+			const gambleResult = game.gamble.buySellStock(discordId, name, cnt, isFull);
+			if (!gambleResult.code) {
+				await interaction.reply({ content: gambleResult.message });
+				return;
+			}
+			const dbResult = await UserModel.updateStock(discordId, {
+				name,
+				cnt: gambleResult.cnt,
+			});
+			if (!dbResult.code) {
+				await interaction.reply({ content: dbResult.message });
+				return;
+			}
 
-			await interaction.reply({ content });
+			await interaction.reply({ content: '매수완료!' });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });

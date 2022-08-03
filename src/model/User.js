@@ -1,19 +1,5 @@
 const mongoose = require('mongoose');
-
-const stockListSchema = new mongoose.Schema({
-	stock: {
-		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Stock',
-	},
-	cnt: {
-		type: Number,
-		default: 0,
-	},
-	value: {
-		type: Number,
-		required: true,
-	},
-});
+const StockModel = require('./Stock');
 
 const User = new mongoose.Schema({
 	discordId: {
@@ -30,17 +16,71 @@ const User = new mongoose.Schema({
 		type: Number,
 		default: 1000000,
 	},
-	stockList: [stockListSchema],
+	stockList: [
+		{
+			stock: {
+				type: mongoose.Schema.Types.ObjectId,
+				ref: 'Stock',
+			},
+			cnt: {
+				type: Number,
+				default: 0,
+			},
+			value: {
+				type: Number,
+				required: true,
+			},
+		},
+	],
 });
 
 /**
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
- * @param {String} discordId
+ * @param {string} discordId
  */
 User.statics.findByDiscordId = async function (discordId) {
 	const userInfo = await this.findOne({ discordId });
 	return userInfo;
+};
+
+/**
+ * 아이디로 유저정보 탐색
+ * @this import('mongoose').Model
+ * @param {string} discordId
+ * @param {{ name: string, cnt: string }} updStockInfo
+ */
+User.statics.updateStock = async function (discordId, updStockInfo) {
+	const userInfo = await this.findOne({ discordId }).populate('stockList.stock');
+	if (!userInfo) {
+		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };
+	}
+
+	const myStock = userInfo.stockList.find(myStock => {
+		return myStock.stock.name === updStockInfo.name;
+	});
+
+	if (myStock) {
+		const averageValue = Math.floor(
+			(updStockInfo.cnt * myStock.stock.value + myStock.cnt * myStock.value) /
+				(myStock.cnt + updStockInfo.cnt),
+		);
+		myStock.value = myStock.cnt + updStockInfo.cnt !== 0 ? averageValue : 0;
+		myStock.cnt += updStockInfo.cnt;
+	} else {
+		const stock = await StockModel.findByName(updStockInfo.name);
+		if (!stock) {
+			return { code: 0, message: '[DB]주식정보를 찾을 수 없습니다.' };
+		}
+		userInfo.stockList.push({
+			stock,
+			value: stock.value,
+			cnt: updStockInfo.cnt,
+		});
+	}
+
+	await userInfo.save();
+	return { code: 1 };
 };
 
 /**
