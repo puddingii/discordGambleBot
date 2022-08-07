@@ -26,6 +26,7 @@ module.exports = {
 			/** 유저정보가 없을 때 */
 			if (!userInfo) {
 				await UserModel.create({ discordId, nickname });
+				game.gamble.addUser({ id: discordId, nickname });
 				await interaction.reply({
 					content: '유저등록 완료! 이제부터 게임에 참여 가능합니다',
 				});

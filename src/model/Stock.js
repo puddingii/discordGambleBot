@@ -1,16 +1,12 @@
 const mongoose = require('mongoose');
+const dayjs = require('dayjs');
 const secretKey = require('../config/secretKey');
+const logger = require('../config/logger');
 
-const historySchema = new mongoose.Schema({
-	value: {
-		type: Number,
-		required: true,
-	},
-	date: {
-		type: Date,
-		default: Date.now,
-	},
-});
+/**
+ * @typedef {import('../controller/Gamble/Coin')} Coin
+ * @typedef {import('../controller/Gamble/Stock')} Stock
+ */
 
 const Stock = new mongoose.Schema({
 	/** 이름 */
@@ -36,12 +32,12 @@ const Stock = new mongoose.Schema({
 	},
 	/** 변동률 최소치 */
 	minRatio: {
-		type: String,
+		type: Number,
 		default: -0.05,
 	},
 	/** 변동률 최대치 */
 	maxRatio: {
-		type: String,
+		type: Number,
 		default: 0.05,
 	},
 	/** 업데이트 주기. 모든 코인, 주식 동일하게 2시간마다 */
@@ -55,7 +51,20 @@ const Stock = new mongoose.Schema({
 		default: 4,
 	},
 	/** 주식 히스토리 */
-	updHistory: [historySchema],
+	updHistory: [
+		{
+			value: {
+				type: Number,
+				required: true,
+			},
+			date: {
+				type: String,
+				default: () => {
+					return dayjs().toDate().toString();
+				},
+			},
+		},
+	],
 	/** 환경에 영향을 받는정도 순서대로 [아무일없음,씹악재, 악재, 호재, 씹호재] */
 	conditionList: {
 		type: Array,
@@ -103,6 +112,31 @@ Stock.statics.addStock = async function (stockInfo) {
 Stock.statics.findByName = async function (name) {
 	const stockInfo = await this.findOne({ name });
 	return stockInfo;
+};
+
+/**
+ * 주식정보 리스트째로 업데이트
+ * @this import('mongoose').Model
+ * @param {Coin[] | Stock[]} updateList
+ */
+Stock.statics.updateStock = async function (updateList) {
+	const updPromiseList = updateList.map(async updStock => {
+		const stock = await this.findOne({ name: updStock.name });
+		stock.value = updStock.value;
+		stock.updHistory = [
+			...stock.updHistory,
+			{ value: updStock.value, date: dayjs().toDate().toString() },
+		];
+		return stock.save();
+	});
+
+	const resultList = await Promise.allSettled(updPromiseList);
+
+	resultList.forEach(result => {
+		if (result.status !== 'fulfilled') {
+			logger.error(`${result.reason}`);
+		}
+	});
 };
 
 /**

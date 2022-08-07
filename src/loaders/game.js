@@ -55,5 +55,14 @@ module.exports = async () => {
 
 	const gamble = new Gamble(userList, coinList, stockList);
 	const game = new Game(gamble);
+	setInterval(() => {
+		/** 6시간마다 컨디션 조정 */
+		if (game.gamble.curTime % 12 === 0) {
+			game.gamble.updateCondition();
+		}
+		game.gamble.curTime++;
+		const updateList = game.gamble.update();
+		updateList.length && StockModel.updateStock(updateList);
+	}, 1000 * 10 * 1); // 맨 뒤의 값이 분단위임
 	return game;
 };

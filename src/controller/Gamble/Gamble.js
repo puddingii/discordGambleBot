@@ -96,29 +96,32 @@ module.exports = class Gamble {
 
 	/**
 	 * 내가 가지고 있는 주식리스트
-	 * @param {string} id
+	 * @param {string} myDiscordId
+	 * @return {{ name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number }[]}
 	 */
-	getMyStock(id) {
-		const user = this.userList.find(userInfo => userInfo.getId() === id);
+	getMyStock(myDiscordId) {
+		const user = this.userList.find(userInfo => userInfo.getId() === myDiscordId);
 		if (!user) {
 			return { code: 1, message: '유저정보를 찾을 수 없습니다.' };
 		}
 
 		const stockList = user.stockList.reduce((acc, myStock) => {
 			if (myStock.cnt > 0) {
-				const ratio = _.round((myStock.stock.value / myStock.value) * 100, 2);
+				const myRatio = _.round((myStock.stock.value / myStock.value) * 100 - 100, 2);
 				acc.push({
 					name: myStock.stock.name,
-					ratio,
+					cnt: myStock.cnt,
+					myRatio,
 					myValue: myStock.value,
 					stockValue: myStock.stock.value,
-					stockBeforeRatio: myStock.stock.beforeHistoryRatio,
+					stockType: myStock.stock.type,
+					stockBeforeRatio: _.round(myStock.stock.beforeHistoryRatio * 100, 2),
 				});
 			}
 			return acc;
 		}, []);
 
-		return stockList;
+		return { stockList, totalCnt: _.sumBy(user.stockList, 'cnt') };
 	}
 
 	/**
@@ -147,15 +150,19 @@ module.exports = class Gamble {
 
 	/** 주식정보 갱신하기 */
 	update() {
+		const updatedList = [];
 		this.stockList.forEach(stock => {
 			const myStock = new Condition(stock);
 			const ratio = myStock.getRandomRatio();
-			stock.update(this.curTime, ratio, this.curCondition);
+			const result = stock.update(this.curTime, ratio, this.curCondition);
+			result.code && updatedList.push(stock);
 		});
 		this.coinList.forEach(coin => {
 			const ratio = coin.getRandomRatio();
-			coin.update(this.curTime, ratio);
+			const result = coin.update(this.curTime, ratio);
+			result.code && updatedList.push(coin);
 		});
+		return updatedList;
 	}
 
 	/** Gamble의 condition 조정 */

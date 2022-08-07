@@ -10,12 +10,13 @@ module.exports = class Stock extends StockAbstract {
 	giveDividend() {}
 	update(curTime, ratio, curCondition) {
 		if (this.isUpdateTime(curTime)) {
-			return;
+			return { code: 0 };
 		}
 		const updRatio = ratio + this.conditionList[curCondition];
 		const correctRatio = updRatio + this.calcCorrect();
 		this.value *= 1 + correctRatio;
 		this.beforeHistoryRatio = correctRatio;
 		this.addCorrectionHistory(this.value, updRatio);
+		return { code: 1 };
 	}
 };
