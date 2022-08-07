@@ -71,7 +71,10 @@ module.exports = {
 			const MAX_RATIO = 0.2;
 
 			if (passwd !== secretKey.adminPw) {
-				await interaction.reply({ content: '어드민 비밀번호가 다릅니다' });
+				await interaction.reply({
+					content: '어드민 비밀번호가 다릅니다',
+					ephemeral: true,
+				});
 				return;
 			}
 
@@ -79,6 +82,7 @@ module.exports = {
 			if (conditionList.length !== 5) {
 				await interaction.reply({
 					content: '조정 퍼센트 입력형식이 이상합니다. 다시 입력해주세요.',
+					ephemeral: true,
 				});
 				return;
 			}
@@ -95,6 +99,7 @@ module.exports = {
 			) {
 				await interaction.reply({
 					content: '모든 비율은 +-0.2퍼센트 초과로 지정할 수 없습니다.',
+					ephemeral: true,
 				});
 				return;
 			}
@@ -124,10 +129,10 @@ module.exports = {
 				game.gamble.addStock(stock);
 			}
 
-			await interaction.reply({ content });
+			await interaction.reply({ content, ephemeral: true });
 		} catch (err) {
 			logger.error(err);
-			await interaction.reply({ content: `${err}` });
+			await interaction.reply({ content: `${err}`, ephemeral: true });
 		}
 	},
 };
