@@ -22,9 +22,10 @@ module.exports = class Gamble {
 		this.stockList = stockList ?? [];
 		/** @type {Array<User>} */
 		this.userList = userList ?? [];
-		this.conditionRatioPerList = [5, 10, 10, 5];
+		this.conditionRatioPerList = [4, 16, 16, 4];
 		this.curCondition = 0;
 		this.curTime = 0;
+		this.conditionPeriod = 24;
 	}
 
 	/**
@@ -172,7 +173,7 @@ module.exports = class Gamble {
 		let perTotal = 0;
 		this.conditionRatioPerList.some((ratio, idx) => {
 			if (randIdx <= ratio + perTotal) {
-				this.curCondition = idx;
+				this.curCondition = idx + 1;
 				return true;
 			}
 			perTotal += ratio;

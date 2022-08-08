@@ -40,10 +40,10 @@ module.exports = {
 					embedBox.addField(
 						`${stock.name} ${
 							stock.stockType === 'stock' ? '주식' : '코인'
-						} - ${util.setComma(_.round(stock.stockValue, 2))}원 (${upDownEmoji(
+						} - ${util.setComma(Math.floor(stock.stockValue))}원 (${upDownEmoji(
 							stock.stockBeforeRatio,
 						)}%)`,
-						`내 포지션: ${util.setComma(_.round(stock.myValue, 2))}원\n수익률: ${
+						`내 포지션: ${util.setComma(Math.floor(stock.myValue))}원\n수익률: ${
 							stock.myRatio
 						}%\n보유비중: ${stock.cnt}개 (${_.round((stock.cnt / totalCnt) * 100, 2)}%)`,
 					);
