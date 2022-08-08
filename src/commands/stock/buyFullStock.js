@@ -5,13 +5,10 @@ const {
 
 module.exports = {
 	data: new SlashCommandBuilder()
-		.setName('주식매수')
-		.setDescription('주식 or 코인 사기')
+		.setName('주식풀매수')
+		.setDescription('주식 or 코인 풀매수')
 		.addStringOption(option =>
 			option.setName('이름').setDescription('주식이름').setRequired(true),
-		)
-		.addNumberOption(option =>
-			option.setName('수량').setDescription('몇개나 살건지').setRequired(true),
 		),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction
@@ -22,14 +19,8 @@ module.exports = {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름');
-			const cnt = Math.floor(interaction.options.getNumber('수량'));
 
-			if (cnt < 1) {
-				await interaction.reply({ content: '갯수를 입력해주세요' });
-				return;
-			}
-
-			const gambleResult = game.gamble.buySellStock(discordId, name, cnt, false);
+			const gambleResult = game.gamble.buySellStock(discordId, name, 1, true);
 			if (!gambleResult.code) {
 				await interaction.reply({ content: gambleResult.message });
 				return;
@@ -45,7 +36,7 @@ module.exports = {
 				return;
 			}
 
-			await interaction.reply({ content: '매수완료!' });
+			await interaction.reply({ content: '풀매수완료!' });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });

@@ -10,10 +10,9 @@ module.exports = {
 		.addStringOption(option =>
 			option.setName('이름').setDescription('주식이름').setRequired(true),
 		)
-		.addBooleanOption(option =>
-			option.setName('풀매도').setDescription('풀매도 할거?').setRequired(true),
-		)
-		.addNumberOption(option => option.setName('수량').setDescription('몇개나 팔건지')),
+		.addNumberOption(option =>
+			option.setName('수량').setDescription('몇개나 팔건지').setRequired(true),
+		),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction
 	 * @param {import('../../controller/Game')} game
@@ -23,15 +22,14 @@ module.exports = {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름');
-			const isFull = interaction.options.getBoolean('풀매도');
-			const cnt = isFull ? 1 : Math.floor(interaction.options.getNumber('수량'));
+			const cnt = Math.floor(interaction.options.getNumber('수량'));
 
-			if (!isFull && cnt < 1) {
+			if (cnt < 1) {
 				await interaction.reply({ content: '갯수를 입력해주세요' });
 				return;
 			}
 
-			const gambleResult = game.gamble.buySellStock(discordId, name, cnt * -1, isFull);
+			const gambleResult = game.gamble.buySellStock(discordId, name, cnt * -1, false);
 			if (!gambleResult.code) {
 				await interaction.reply({ content: gambleResult.message });
 				return;
