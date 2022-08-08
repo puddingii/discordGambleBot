@@ -15,4 +15,5 @@ module.exports = {
 	guildId2: process.env.GUILD_ID2,
 	adminPw: process.env.ADMIN_PW,
 	stockUpdateTime: parseInt(process.env.STOCK_UPDATE_TIME, 10),
+	imgServer: process.env.IMG_SERVER,
 };
