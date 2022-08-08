@@ -180,4 +180,19 @@ module.exports = class Gamble {
 			return false;
 		});
 	}
+
+	/**
+	 * 돈 갱신
+	 * @param {string} userId 유저아이디
+	 * @param {number} value 업데이트 할 금액
+	 * @returns {DefaultResult & { money?: number }}
+	 */
+	updateMoney(userId, value) {
+		const userInfo = this.userList.find(user => user.getId() === userId);
+		if (!userInfo) {
+			return { code: 0, message: '유저정보가 없습니다' };
+		}
+		const result = userInfo.updateMoney(value);
+		return { ...result, money: userInfo.money };
+	}
 };

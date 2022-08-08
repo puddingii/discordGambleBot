@@ -83,6 +83,22 @@ User.statics.updateStock = async function (discordId, updStockInfo) {
 /**
  * 아이디로 유저정보 탐색
  * @this import('mongoose').Model
+ * @param {string} discordId
+ * @param {number} money
+ */
+User.statics.updateMoney = async function (discordId, money) {
+	const userInfo = await this.findOne({ discordId });
+	if (!userInfo) {
+		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };
+	}
+	userInfo.money = money;
+	await userInfo.save();
+	return { code: 1 };
+};
+
+/**
+ * 아이디로 유저정보 탐색
+ * @this import('mongoose').Model
  * @param {{userId: String, nickname?: String}}
  */
 User.statics.findByWeb = async function (orOptions) {
