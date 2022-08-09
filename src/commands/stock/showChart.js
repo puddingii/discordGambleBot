@@ -81,19 +81,17 @@ module.exports = {
 			const svgFileName = `${Math.random().toString(36).substring(2, 12)}.svg`;
 			const cuPath = path.resolve(__dirname, `../../../imgs/${svgFileName}`);
 			fs.writeFileSync(cuPath, svgStr);
-			const imgUrl = `${secretKey}/img/${svgFileName}`;
+			const imgUrl = `../../../imgs/${svgFileName}`;
 
 			const embedBox = new MessageEmbed();
 			embedBox
 				.setColor('#0099ff')
-				.setTitle(`Chart`)
-				.setDescription('최근 12시간의 그래프')
-				.addField('\u200B', '\u200B')
-				.setThumbnail('https://i.imgur.com/AfFp7pu.png')
-				.setImage(imgUrl)
+				.setTitle(`차트`)
+				.setDescription('그래프')
+				.addFields('\u200B', '\u200B')
 				.setTimestamp();
 
-			await interaction.reply({ embeds: [embedBox] });
+			await interaction.reply({ embeds: [embedBox], files: [imgUrl] });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });
