@@ -151,19 +151,27 @@ module.exports = class Gamble {
 
 	/** 주식정보 갱신하기 */
 	update() {
-		const updatedList = [];
+		const updStockList = [];
+		let updUserList = [];
 		this.stockList.forEach(stock => {
 			const myStock = new Condition(stock);
 			const ratio = myStock.getRandomRatio();
-			const result = stock.update(this.curTime, ratio, this.curCondition);
-			result.code && updatedList.push(stock);
+			const updResult = stock.update(this.curTime, ratio, this.curCondition);
+			updResult.code && updStockList.push(stock);
 		});
+		// 주식 배당금
+		if (this.curTime % 48 === 0) {
+			updUserList = this.userList.filter(user => {
+				const result = user.giveDividend();
+				return !!result.code;
+			});
+		}
 		this.coinList.forEach(coin => {
 			const ratio = coin.getRandomRatio();
 			const result = coin.update(this.curTime, ratio);
-			result.code && updatedList.push(coin);
+			result.code && updStockList.push(coin);
 		});
-		return updatedList;
+		return { stockList: updStockList, userList: updUserList };
 	}
 
 	/** Gamble의 condition 조정 */
@@ -185,7 +193,7 @@ module.exports = class Gamble {
 	 * 돈 갱신
 	 * @param {string} userId 유저아이디
 	 * @param {number} value 업데이트 할 금액
-	 * @returns {DefaultResult & { money?: number }}
+	 * @returns {DefaultResult & { userInfo?: Stock }}
 	 */
 	updateMoney(userId, value) {
 		const userInfo = this.userList.find(user => user.getId() === userId);
@@ -193,6 +201,6 @@ module.exports = class Gamble {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}
 		const result = userInfo.updateMoney(value);
-		return { ...result, money: userInfo.money };
+		return { ...result, userInfo };
 	}
 };

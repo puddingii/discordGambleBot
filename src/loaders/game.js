@@ -61,8 +61,9 @@ module.exports = async () => {
 			game.gamble.updateCondition();
 		}
 		game.gamble.curTime++;
-		const updateList = game.gamble.update();
-		updateList.length && StockModel.updateStock(updateList);
+		const { stockList, userList } = game.gamble.update();
+		stockList.length && StockModel.updateStock(stockList);
+		userList.length && UserModel.updateMoney(userList);
 	}, 1000 * 60 * 30); // 맨 뒤의 값이 분단위임
 	return game;
 };

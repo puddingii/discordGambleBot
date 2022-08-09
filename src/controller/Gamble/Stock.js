@@ -7,7 +7,6 @@ module.exports = class Stock extends StockAbstract {
 		this.conditionList = info.conditionList ?? [0, -0.06, -0.04, 0.04, 0.06];
 	}
 
-	giveDividend() {}
 	update(curTime, ratio, curCondition) {
 		if (this.isUpdateTime(curTime)) {
 			return { code: 0 };

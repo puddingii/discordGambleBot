@@ -31,6 +31,21 @@ module.exports = class User {
 			return stockInfo.stock.name === name;
 		});
 	}
+
+	/** 가지고 있는 주식들 배당금 지급
+	 * @return {{ code: number }}
+	 */
+	giveDividend() {
+		const totalMoney = this.stockList.reduce((acc, cur) => {
+			if (cur.cnt > 0 && cur.stock.type === 'stock') {
+				acc += cur.stock.dividend * cur.stock.value * cur.cnt;
+			}
+			return acc;
+		}, 0);
+		this.money += totalMoney;
+		return { code: !!totalMoney };
+	}
+
 	/**
 	 * @param {Number} money
 	 * @param {'stock' | 'coin'} type
