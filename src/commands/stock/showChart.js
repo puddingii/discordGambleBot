@@ -1,10 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const echarts = require('echarts');
-const fs = require('fs');
 const { MessageEmbed } = require('discord.js');
-const path = require('path');
+const sharp = require('sharp');
 const {
-	cradle: { StockModel, logger, secretKey },
+	cradle: { logger },
 } = require('../../config/dependencyInjection');
 
 module.exports = {
@@ -76,22 +75,19 @@ module.exports = {
 				],
 			});
 
-			// Output string
+			// 차트 이미지 생성
 			const svgStr = chart.renderToSVGString();
-			const svgFileName = `${Math.random().toString(36).substring(2, 12)}.svg`;
-			const cuPath = path.resolve(__dirname, `../../../imgs/${svgFileName}`);
-			fs.writeFileSync(cuPath, svgStr);
-			const imgUrl = `../../../imgs/${svgFileName}`;
+			const imageBuf = await sharp(Buffer.from(svgStr)).jpeg().toBuffer();
 
 			const embedBox = new MessageEmbed();
 			embedBox
 				.setColor('#0099ff')
 				.setTitle(`차트`)
 				.setDescription('그래프')
-				.addFields('\u200B', '\u200B')
+				.addFields([{ name: '\u200B', value: '\u200B' }])
 				.setTimestamp();
 
-			await interaction.reply({ embeds: [embedBox], files: [imgUrl] });
+			await interaction.reply({ files: [imageBuf] });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });
