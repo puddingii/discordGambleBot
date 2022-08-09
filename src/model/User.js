@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const StockModel = require('./Stock');
+const logger = require('../config/logger');
 
 const User = new mongoose.Schema({
 	discordId: {
@@ -81,18 +82,24 @@ User.statics.updateStock = async function (discordId, updStockInfo) {
 };
 
 /**
- * 아이디로 유저정보 탐색
+ * 유저 머니 업데이트
  * @this import('mongoose').Model
- * @param {string} discordId
- * @param {number} money
+ * @param {import('../controller/Gamble/User')[]} userList
  */
-User.statics.updateMoney = async function (discordId, money) {
-	const userInfo = await this.findOne({ discordId });
-	if (!userInfo) {
-		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };
-	}
-	userInfo.money = money;
-	await userInfo.save();
+User.statics.updateMoney = async function (userList) {
+	const updPromiseList = userList.map(async updUser => {
+		const user = await this.findOne({ discordId: updUser.getId() });
+		user.money = updUser.money;
+		return user.save();
+	});
+
+	const resultList = await Promise.allSettled(updPromiseList);
+
+	resultList.forEach(result => {
+		if (result.status !== 'fulfilled') {
+			logger.error(`${result.reason}`);
+		}
+	});
 	return { code: 1 };
 };
 

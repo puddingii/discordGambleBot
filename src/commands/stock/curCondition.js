@@ -38,16 +38,16 @@ module.exports = {
 
 			const result = game.gamble.updateMoney(discordId, -10000);
 			if (!result.code) {
-				await interaction.reply({ content: result.message });
+				await interaction.reply({ content: result.message, ephemeral: true });
 				return;
 			}
-			const dbResult = await UserModel.updateMoney(discordId, result.money);
+			const dbResult = await UserModel.updateMoney([result.userInfo]);
 			if (!dbResult.code) {
-				await interaction.reply({ content: dbResult.message });
+				await interaction.reply({ content: dbResult.message, ephemeral: true });
 				return;
 			}
 
-			await interaction.reply({ content: conditionText });
+			await interaction.reply({ content: conditionText, ephemeral: true });
 		} catch (err) {
 			logger.error(err);
 			await interaction.reply({ content: `${err}` });
