@@ -25,35 +25,39 @@ module.exports = {
 				.setTimestamp();
 
 			/** DB Info */
-			const { stockList, totalCnt } = game.gamble.getMyStock(discordId);
-			stockList.reduce(
-				(acc, stock) => {
-					const upDownEmoji = num => {
-						if (num > 0) {
-							return `🔺 ${num}`;
-						}
-						if (num < 0) {
-							return `🔻 ${num}`;
-						}
-						return `🟥 ${num}`;
-					};
-					embedBox.addField(
-						`${stock.name} ${
-							stock.stockType === 'stock' ? '주식' : '코인'
-						} - ${util.setComma(Math.floor(stock.stockValue))}원 (${upDownEmoji(
-							stock.stockBeforeRatio,
-						)}%)`,
-						`내 포지션: ${util.setComma(Math.floor(stock.myValue))}원\n수익률: ${
-							stock.myRatio
-						}%\n보유비중: ${stock.cnt}개 (${_.round((stock.cnt / totalCnt) * 100, 2)}%)`,
-					);
-					acc.stockValue += stock.stockValue * stock.cnt;
-					acc.myValue += stock.myValue * stock.cnt;
-
-					return acc;
-				},
-				{ stockValue: 0, myValue: 0 },
-			);
+			const { stockList, totalCnt, totalMyValue, totalStockValue } =
+				game.gamble.getMyStock(discordId);
+			stockList.forEach(stock => {
+				const upDownEmoji = num => {
+					return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
+				};
+				const formatIntComma = num => {
+					return util.setComma(Math.floor(num));
+				};
+				const calcPrice = stock.cnt * (stock.stockValue - stock.myValue);
+				embedBox.addField(
+					`${stock.name} ${
+						stock.stockType === 'stock' ? '주식' : '코인'
+					} - ${formatIntComma(stock.stockValue)}원 (${upDownEmoji(
+						stock.stockBeforeRatio,
+					)}%)`,
+					`내 포지션: ${formatIntComma(stock.myValue)}원\n수익률: ${
+						stock.myRatio
+					}%\n평가손익: ${formatIntComma(calcPrice)}원\n보유갯수|전체비중: ${
+						stock.cnt
+					}개 | ${_.round((stock.cnt / totalCnt) * 100, 2)}%`,
+				);
+			});
+			embedBox
+				.addField('\u200B', '\u200B')
+				.addField(
+					'요약',
+					`총 평가: ${util.setComma(
+						Math.floor(totalMyValue),
+					)}원\n총 매입: ${util.setComma(
+						Math.floor(totalStockValue),
+					)}원\n총 수익률: ${_.round((totalStockValue / totalMyValue) * 100, 2)}%`,
+				);
 
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {

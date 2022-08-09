@@ -98,7 +98,7 @@ module.exports = class Gamble {
 	/**
 	 * 내가 가지고 있는 주식리스트
 	 * @param {string} myDiscordId
-	 * @return {{ name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number }[]}
+	 * @return {{ stockList: {name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number}[], totalCnt: number, totalMyValue: number, totalStockValue: number}}
 	 */
 	getMyStock(myDiscordId) {
 		const user = this.userList.find(userInfo => userInfo.getId() === myDiscordId);
@@ -106,23 +106,29 @@ module.exports = class Gamble {
 			return { code: 1, message: '유저정보를 찾을 수 없습니다.' };
 		}
 
-		const stockList = user.stockList.reduce((acc, myStock) => {
-			if (myStock.cnt > 0) {
-				const myRatio = _.round((myStock.stock.value / myStock.value) * 100 - 100, 2);
-				acc.push({
-					name: myStock.stock.name,
-					cnt: myStock.cnt,
-					myRatio,
-					myValue: myStock.value,
-					stockValue: myStock.stock.value,
-					stockType: myStock.stock.type,
-					stockBeforeRatio: _.round(myStock.stock.beforeHistoryRatio * 100, 2),
-				});
-			}
-			return acc;
-		}, []);
+		const stockInfo = user.stockList.reduce(
+			(acc, myStock) => {
+				if (myStock.cnt > 0) {
+					const myRatio = _.round((myStock.stock.value / myStock.value) * 100 - 100, 2);
+					acc.stockList.push({
+						name: myStock.stock.name,
+						cnt: myStock.cnt,
+						myValue: myStock.value,
+						myRatio,
+						stockValue: myStock.stock.value,
+						stockType: myStock.stock.type,
+						stockBeforeRatio: _.round(myStock.stock.beforeHistoryRatio * 100, 2),
+					});
+					acc.totalCnt += myStock.cnt;
+					acc.totalMyValue += myStock.cnt * myStock.value;
+					acc.totalStockValue += myStock.cnt * myStock.stock.value;
+				}
+				return acc;
+			},
+			{ stockList: [], totalCnt: 0, totalMyValue: 0, totalStockValue: 0 },
+		);
 
-		return { stockList, totalCnt: _.sumBy(user.stockList, 'cnt') };
+		return stockInfo;
 	}
 
 	/**
