@@ -7,7 +7,7 @@ const {
 module.exports = async () => {
 	try {
 		const dbConnctionURL =
-			secretKey.nodeEnv !== 'production'
+			secretKey.nodeEnv === 'development'
 				? `mongodb://${secretKey.isDocker ? 'mongo' : 'localhost:27017'}/discordGame`
 				: `mongodb+srv://${secretKey.mongoId}:${secretKey.mongoPw}@discordgamebot.azjqlii.mongodb.net/?retryWrites=true&w=majority`;
 		await mongoose.connect(dbConnctionURL);

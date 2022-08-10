@@ -4,6 +4,7 @@
 	"main": "app.js",
 	"scripts": {
 		"start": "cross-env NODE_ENV=production node src/deploy-command.js && node src/app.js",
+		"start:commandBuild": "cross-env NODE_ENV=production node src/deploy-command.js",
 		"build": "babel src -d build",
 		"dev:app": "cross-env NODE_ENV=development node src/deploy-command.js && cross-env NODE_ENV=development node src/app.js",
 		"dev:deploy": "cross-env NODE_ENV=development node src/deploy-command.js",
