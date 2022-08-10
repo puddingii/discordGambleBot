@@ -18,7 +18,7 @@ module.exports = {
 			const userInfo = game.gamble.userList.find(user => user.getId() === discordId);
 
 			await interaction.reply({
-				content: `가지고 있는 돈: ${setComma(Math.floor(userInfo.money))}원`,
+				content: `가지고 있는 돈: ${setComma(userInfo.money, true)}원`,
 			});
 		} catch (err) {
 			logger.error(err);

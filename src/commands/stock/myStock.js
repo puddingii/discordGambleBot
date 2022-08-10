@@ -21,12 +21,9 @@ module.exports = {
 				.setColor('#0099ff')
 				.setTitle('내 주식 리스트')
 				.setDescription(`${dayjs().format('M월 DD일')} 내 주식리스트`)
-				.addField('\u200B', '\u200B')
+				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
 
-			const formatIntComma = num => {
-				return util.setComma(Math.floor(num));
-			};
 			/** DB Info */
 			const { stockList, totalMyValue, totalStockValue } =
 				game.gamble.getMyStock(discordId);
@@ -37,34 +34,38 @@ module.exports = {
 
 				const calcPrice = stock.cnt * (stock.stockValue - stock.myValue);
 				acc += calcPrice;
-				embedBox.addField(
-					`${stock.name} ${
+				embedBox.addFields({
+					name: `${stock.name} ${
 						stock.stockType === 'stock' ? '주식' : '코인'
-					} - ${formatIntComma(stock.stockValue)}원 (${upDownEmoji(
+					} - ${util.setComma(stock.stockValue, true)}원 (${upDownEmoji(
 						stock.stockBeforeRatio,
 					)}%)`,
-					`내 포지션: ${formatIntComma(stock.myValue)}원\n손익,수익률: ${formatIntComma(
-						calcPrice,
-					)}원 (${stock.myRatio}%)\n보유비중: ${stock.cnt}개 | ${_.round(
+					value: `내 포지션: ${util.setComma(
+						stock.myValue,
+						true,
+					)}원\n손익,수익률: ${util.setComma(calcPrice, true)}원 (${
+						stock.myRatio
+					}%)\n보유비중: ${stock.cnt}개 | ${_.round(
 						((stock.cnt * stock.myValue) / totalMyValue) * 100,
 						2,
 					)}%`,
-				);
+				});
 				return acc;
 			}, 0);
-			embedBox
-				.addField('\u200B', '\u200B')
-				.addField(
-					'요약',
-					`총 투자액: ${util.setComma(
-						Math.floor(totalMyValue),
-					)}원\n총 주식평단가: ${formatIntComma(
-						totalStockValue,
-					)}\n총 수익: ${util.setComma(Math.floor(totalCalc))}원\n총 수익률: ${_.round(
-						(totalStockValue / totalMyValue) * 100,
-						2,
-					)}%`,
-				);
+
+			embedBox.addFields({ name: '\u200B', value: '\u200B' }).addFields({
+				name: '요약',
+				value: `총 투자액: ${util.setComma(
+					totalMyValue,
+					true,
+				)}원\n총 주식평단가: ${util.setComma(
+					totalStockValue,
+					true,
+				)}원\n총 수익: ${util.setComma(totalCalc, true)}원\n총 수익률: ${_.round(
+					(totalStockValue / totalMyValue) * 100,
+					2,
+				)}%`,
+			});
 
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {

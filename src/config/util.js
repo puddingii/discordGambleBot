@@ -1,11 +1,16 @@
 module.exports = new (class {
-	setComma(num) {
-		if (typeof num === 'number') {
-			num = num.toString();
-		}
+	/**
+	 * 세자리수마다 컴마 찍어주기
+	 * @param {string | number} num
+	 * @param {boolean} isRemoveDecimal
+	 * @return {string}
+	 */
+	setComma(num, isRemoveDecimal) {
 		if (!num) {
-			return;
+			return 0;
 		}
+		num = isRemoveDecimal ? Math.floor(Number(num)) : Number(num);
+		num = num.toString();
 		return num.replace(/(\d)(?=(?:\d{3})+(?!\d))/g, '$1,');
 	}
 })();

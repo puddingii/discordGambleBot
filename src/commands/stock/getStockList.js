@@ -37,18 +37,18 @@ module.exports = {
 						condition * 30
 					}분 미만`,
 				)
-				.addField('\u200B', '\u200B')
+				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
 
 			/** DB Info */
 			const stockList = game.gamble.getAllStock(stockType);
 			stockList.forEach(stock => {
-				embedBox.addField(
-					`${stock.name} ${stock.type === 'stock' ? '주식' : '코인'} - ${util.setComma(
-						Math.floor(stock.value),
-					)}원`,
-					stock.comment,
-				);
+				embedBox.addFields({
+					name: `${stock.name} ${
+						stock.type === 'stock' ? '주식' : '코인'
+					} - ${util.setComma(stock.value, true)}원`,
+					value: stock.comment,
+				});
 			});
 
 			await interaction.reply({ embeds: [embedBox] });
