@@ -43,18 +43,25 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 
 	/** Apply commands */
 	const rest = new REST({ version: '9' }).setToken(secretKey.botToken);
-	if (secretKey.nodeEnv !== 'production') {
-		rest
-			.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId), {
-				body: commands,
-			})
-			.then(() => logger.info('Successfully registered application commands.'))
-			.catch(err => logger.error(err));
-	} else {
-		/** Global apply => After 1 hour. */
-		rest
-			.put(Routes.applicationCommands(secretKey.clientId), { body: commands })
-			.then(() => logger.info('Successfully registered global application commands.'))
-			.catch(err => logger.error(err));
-	}
+	rest
+		.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId), {
+			body: commands,
+		})
+		.then(() => logger.info('Successfully registered application commands.'))
+		.catch(err => logger.error(err));
+	// if (secretKey.nodeEnv !== 'production') {
+	// 	rest
+	// 		.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId), {
+	// 			body: commands,
+	// 		})
+	// 		.then(() => logger.info('Successfully registered application commands.'))
+	// 		.catch(err => logger.error(err));
+	// }
+	// else {
+	// 	/** Global apply => After 1 hour. */
+	// 	rest
+	// 		.put(Routes.applicationCommands(secretKey.clientId), { body: commands })
+	// 		.then(() => logger.info('Successfully registered global application commands.'))
+	// 		.catch(err => logger.error(err));
+	// }
 })();
