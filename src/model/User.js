@@ -103,80 +103,81 @@ User.statics.updateMoney = async function (userList) {
 	return { code: 1 };
 };
 
-/**
- * 아이디로 유저정보 탐색
- * @this import('mongoose').Model
- * @param {{userId: String, nickname?: String}}
- */
-User.statics.findByWeb = async function (orOptions) {
-	const orOptionList = [];
-	Object.entries(orOptions).forEach(([key, value]) => {
-		const obj = {};
-		obj[key] = value;
-		orOptionList.push(obj);
-	});
+// 아래는 참고용 소스
+// /**
+//  * 아이디로 유저정보 탐색
+//  * @this import('mongoose').Model
+//  * @param {{userId: String, nickname?: String}}
+//  */
+// User.statics.findByWeb = async function (orOptions) {
+// 	const orOptionList = [];
+// 	Object.entries(orOptions).forEach(([key, value]) => {
+// 		const obj = {};
+// 		obj[key] = value;
+// 		orOptionList.push(obj);
+// 	});
 
-	const userInfo = await this.findOne({ $or: orOptionList });
-	return userInfo;
-};
+// 	const userInfo = await this.findOne({ $or: orOptionList });
+// 	return userInfo;
+// };
 
-/** 유저정보에 채널 추가 */
-User.statics.addChannel = async function (userInfo, channelInfo) {
-	const user = await userInfo.populate('channelList');
-	if (!user) {
-		throw new Error('User is not found.');
-	}
-	if (user.channelList.find(dbChannel => dbChannel.channelId === channelInfo.channelId)) {
-		return;
-	}
-	user.channelList.push(channelInfo);
-	await user.save();
+// /** 유저정보에 채널 추가 */
+// User.statics.addChannel = async function (userInfo, channelInfo) {
+// 	const user = await userInfo.populate('channelList');
+// 	if (!user) {
+// 		throw new Error('User is not found.');
+// 	}
+// 	if (user.channelList.find(dbChannel => dbChannel.channelId === channelInfo.channelId)) {
+// 		return;
+// 	}
+// 	user.channelList.push(channelInfo);
+// 	await user.save();
 
-	return 1;
-};
+// 	return 1;
+// };
 
-/** 유저정보에 공부정보 추가 */
-User.statics.addStudy = async function (discordId, studyInfo) {
-	const user = await this.findOne({ discordId }).populate('studyList');
-	if (!user) {
-		throw new Error('User is not found.');
-	}
+// /** 유저정보에 공부정보 추가 */
+// User.statics.addStudy = async function (discordId, studyInfo) {
+// 	const user = await this.findOne({ discordId }).populate('studyList');
+// 	if (!user) {
+// 		throw new Error('User is not found.');
+// 	}
 
-	user.studyList.push(studyInfo);
-	await user.save();
+// 	user.studyList.push(studyInfo);
+// 	await user.save();
 
-	return 1;
-};
+// 	return 1;
+// };
 
-/** 유저정보에 Todo정보 추가 */
-User.statics.addTodo = async function (discordId, todoInfo) {
-	const user = await this.findOne({ discordId }).populate('todoList');
-	if (!user) {
-		throw new Error('User is not found.');
-	}
+// /** 유저정보에 Todo정보 추가 */
+// User.statics.addTodo = async function (discordId, todoInfo) {
+// 	const user = await this.findOne({ discordId }).populate('todoList');
+// 	if (!user) {
+// 		throw new Error('User is not found.');
+// 	}
 
-	user.todoList.push(todoInfo);
-	await user.save();
+// 	user.todoList.push(todoInfo);
+// 	await user.save();
 
-	return 1;
-};
+// 	return 1;
+// };
 
-/**
- * Random id 생성 후 저장 및 return
- * @this import('mongoose').Model
- * @param {String} discordId
- */
-User.statics.getRandomId = async function (discordId) {
-	const user = await this.findOne({ discordId });
-	if (!user) {
-		throw new Error('User is not found.');
-	}
+// /**
+//  * Random id 생성 후 저장 및 return
+//  * @this import('mongoose').Model
+//  * @param {String} discordId
+//  */
+// User.statics.getRandomId = async function (discordId) {
+// 	const user = await this.findOne({ discordId });
+// 	if (!user) {
+// 		throw new Error('User is not found.');
+// 	}
 
-	const randomString = Math.random().toString(36).slice(2);
-	user.accessKey = randomString;
-	await user.save();
+// 	const randomString = Math.random().toString(36).slice(2);
+// 	user.accessKey = randomString;
+// 	await user.save();
 
-	return randomString;
-};
+// 	return randomString;
+// };
 
 module.exports = mongoose.model('User', User);

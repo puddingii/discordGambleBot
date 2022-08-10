@@ -139,36 +139,37 @@ Stock.statics.updateStock = async function (updateList) {
 	});
 };
 
-/**
- * 아이디로 유저정보 탐색
- * @this import('mongoose').Model
- * @param {{userId: String, nickname?: String}}
- */
-Stock.statics.findByWeb = async function (orOptions) {
-	const orOptionList = [];
-	Object.entries(orOptions).forEach(([key, value]) => {
-		const obj = {};
-		obj[key] = value;
-		orOptionList.push(obj);
-	});
+// 아래는 참고용 소스
+// /**
+//  * 아이디로 유저정보 탐색
+//  * @this import('mongoose').Model
+//  * @param {{userId: String, nickname?: String}}
+//  */
+// Stock.statics.findByWeb = async function (orOptions) {
+// 	const orOptionList = [];
+// 	Object.entries(orOptions).forEach(([key, value]) => {
+// 		const obj = {};
+// 		obj[key] = value;
+// 		orOptionList.push(obj);
+// 	});
 
-	const userInfo = await this.findOne({ $or: orOptionList });
-	return userInfo;
-};
+// 	const userInfo = await this.findOne({ $or: orOptionList });
+// 	return userInfo;
+// };
 
-/** 유저정보에 채널 추가 */
-Stock.statics.addChannel = async function (userInfo, channelInfo) {
-	const user = await userInfo.populate('channelList');
-	if (!user) {
-		throw new Error('User is not found.');
-	}
-	if (user.channelList.find(dbChannel => dbChannel.channelId === channelInfo.channelId)) {
-		return;
-	}
-	user.channelList.push(channelInfo);
-	await user.save();
+// /** 유저정보에 채널 추가 */
+// Stock.statics.addChannel = async function (userInfo, channelInfo) {
+// 	const user = await userInfo.populate('channelList');
+// 	if (!user) {
+// 		throw new Error('User is not found.');
+// 	}
+// 	if (user.channelList.find(dbChannel => dbChannel.channelId === channelInfo.channelId)) {
+// 		return;
+// 	}
+// 	user.channelList.push(channelInfo);
+// 	await user.save();
 
-	return 1;
-};
+// 	return 1;
+// };
 
 module.exports = mongoose.model('Stock', Stock);

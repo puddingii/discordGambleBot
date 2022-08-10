@@ -1,9 +1,9 @@
 const { SlashCommandBuilder } = require('@discordjs/builders');
 const echarts = require('echarts');
-const { MessageEmbed } = require('discord.js');
 const sharp = require('sharp');
+const dayjs = require('dayjs');
 const {
-	cradle: { logger },
+	cradle: { StockModel, logger },
 } = require('../../config/dependencyInjection');
 
 module.exports = {
@@ -12,6 +12,22 @@ module.exports = {
 		.setDescription('주식 or 코인 차트보기')
 		.addStringOption(option =>
 			option.setName('이름').setDescription('주식이름').setRequired(true),
+		)
+		.addStringOption(option =>
+			option
+				.setName('차트종류')
+				.setDescription('스틱, 라인 차트')
+				.addChoice('캔들스틱', 'stick')
+				.addChoice('라인', 'line'),
+		)
+		.addNumberOption(option =>
+			option
+				.setName('시간봉')
+				.setDescription('몇시간 봉으로 할건지?')
+				.addChoice('8시간(기본값)', 8)
+				.addChoice('16시간', 16)
+				.addChoice('1일', 24)
+				.addChoice('3일', 72),
 		),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction
@@ -20,72 +36,65 @@ module.exports = {
 	async execute(interaction, game) {
 		try {
 			/** Discord Info */
-			const discordId = interaction.user.id.toString();
 			const name = interaction.options.getString('이름');
+			const stickTime = interaction.options.getNumber('시간봉') ?? 8;
+			const chartType = interaction.options.getString('차트종류') ?? 'stick';
 
-			// In SSR mode the first parameter does not need to be passed in as a DOM object
+			const stockInfo = await StockModel.findByName(name);
+			if (!stockInfo) {
+				await interaction.reply({ content: '주식정보를 찾을 수 없습니다.' });
+				return;
+			}
+
 			const chart = echarts.init(null, null, {
-				renderer: 'svg', // must use SVG mode
-				ssr: true, // enable SSR
-				width: 500, // need to specify height and width
-				height: 300,
+				renderer: 'svg',
+				ssr: true,
+				width: 1600,
+				height: 800,
 			});
 
-			// setOption as normal
-			chart.setOption({
+			const chartOptions = {
 				xAxis: {
-					data: [
-						'2017-10-24',
-						'2017-10-25',
-						'2017-10-26',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-						'2017-10-27',
-					],
+					data: [],
 				},
 				yAxis: {},
-				series: [
-					{
-						type: 'candlestick',
-						data: [
-							[20, 34, 10, 38],
-							[40, 35, 30, 50],
-							[31, 38, 33, 44],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-							[38, 15, 5, 42],
-						],
-					},
-				],
-			});
+				series: [{ type: chartType === 'stick' ? 'candlestick' : 'line', data: [] }],
+				backgroundColor: '#FFFFFF',
+			};
+
+			const type = 'stock';
+			const stickPerCnt = stickTime / (type === 'stock' ? 2 : 0.5);
+			let historyStartIdx = stockInfo.updHistory.length - stickPerCnt * 30;
+			historyStartIdx = historyStartIdx < 0 ? 0 : historyStartIdx;
+			for (
+				historyStartIdx;
+				historyStartIdx < stockInfo.updHistory.length;
+				historyStartIdx += stickPerCnt
+			) {
+				const stickData = stockInfo.updHistory.slice(
+					historyStartIdx,
+					historyStartIdx + stickPerCnt,
+				);
+				const valueList = stickData.map(data => data.value);
+				const stickValue =
+					chartType === 'stick'
+						? [
+								stickData[0].value,
+								stickData.at(-1).value,
+								Math.min(...valueList),
+								Math.max(...valueList),
+						  ]
+						: stickData.at(-1).value;
+				chartOptions.xAxis.data.push(dayjs(stickData[0].date).format('MM.DD'));
+				chartOptions.series[0].data.push(stickValue);
+			}
+
+			// 스틱차트는 총 30개로, 스틱 하나당 8시간
+			chart.setOption(chartOptions);
 
 			// 차트 이미지 생성
 			const svgStr = chart.renderToSVGString();
 			const imageBuf = await sharp(Buffer.from(svgStr)).jpeg().toBuffer();
-
-			const embedBox = new MessageEmbed();
-			embedBox
-				.setColor('#0099ff')
-				.setTitle(`차트`)
-				.setDescription('그래프')
-				.addFields([{ name: '\u200B', value: '\u200B' }])
-				.setTimestamp();
 
 			await interaction.reply({ files: [imageBuf] });
 		} catch (err) {
