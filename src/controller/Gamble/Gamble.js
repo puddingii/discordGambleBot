@@ -98,7 +98,7 @@ module.exports = class Gamble {
 	/**
 	 * 내가 가지고 있는 주식리스트
 	 * @param {string} myDiscordId
-	 * @return {{ stockList: {name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number}[], totalCnt: number, totalMyValue: number, totalStockValue: number}}
+	 * @return {{ stockList: {name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number}[], totalMyValue: number, totalStockValue: number}}
 	 */
 	getMyStock(myDiscordId) {
 		const user = this.userList.find(userInfo => userInfo.getId() === myDiscordId);
@@ -119,13 +119,12 @@ module.exports = class Gamble {
 						stockType: myStock.stock.type,
 						stockBeforeRatio: _.round(myStock.stock.beforeHistoryRatio * 100, 2),
 					});
-					acc.totalCnt += myStock.cnt;
 					acc.totalMyValue += myStock.cnt * myStock.value;
 					acc.totalStockValue += myStock.cnt * myStock.stock.value;
 				}
 				return acc;
 			},
-			{ stockList: [], totalCnt: 0, totalMyValue: 0, totalStockValue: 0 },
+			{ stockList: [], totalMyValue: 0, totalStockValue: 0 },
 		);
 
 		return stockInfo;

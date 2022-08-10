@@ -24,39 +24,46 @@ module.exports = {
 				.addField('\u200B', '\u200B')
 				.setTimestamp();
 
+			const formatIntComma = num => {
+				return util.setComma(Math.floor(num));
+			};
 			/** DB Info */
-			const { stockList, totalCnt, totalMyValue, totalStockValue } =
+			const { stockList, totalMyValue, totalStockValue } =
 				game.gamble.getMyStock(discordId);
-			stockList.forEach(stock => {
+			const totalCalc = stockList.reduce((acc, stock) => {
 				const upDownEmoji = num => {
 					return `${num >= 0 ? '🔺' : '🔻'} ${num}`;
 				};
-				const formatIntComma = num => {
-					return util.setComma(Math.floor(num));
-				};
+
 				const calcPrice = stock.cnt * (stock.stockValue - stock.myValue);
+				acc += calcPrice;
 				embedBox.addField(
 					`${stock.name} ${
 						stock.stockType === 'stock' ? '주식' : '코인'
 					} - ${formatIntComma(stock.stockValue)}원 (${upDownEmoji(
 						stock.stockBeforeRatio,
 					)}%)`,
-					`내 포지션: ${formatIntComma(stock.myValue)}원\n수익률: ${
-						stock.myRatio
-					}%\n평가손익: ${formatIntComma(calcPrice)}원\n보유갯수|전체비중: ${
-						stock.cnt
-					}개 | ${_.round((stock.cnt / totalCnt) * 100, 2)}%`,
+					`내 포지션: ${formatIntComma(stock.myValue)}원\n손익,수익률: ${formatIntComma(
+						calcPrice,
+					)}원 (${stock.myRatio}%)\n보유비중: ${stock.cnt}개 | ${_.round(
+						((stock.cnt * stock.myValue) / totalMyValue) * 100,
+						2,
+					)}%`,
 				);
-			});
+				return acc;
+			}, 0);
 			embedBox
 				.addField('\u200B', '\u200B')
 				.addField(
 					'요약',
-					`총 평가: ${util.setComma(
+					`총 투자액: ${util.setComma(
 						Math.floor(totalMyValue),
-					)}원\n총 매입: ${util.setComma(
-						Math.floor(totalStockValue),
-					)}원\n총 수익률: ${_.round((totalStockValue / totalMyValue) * 100, 2)}%`,
+					)}원\n총 주식평단가: ${formatIntComma(
+						totalStockValue,
+					)}\n총 수익: ${util.setComma(Math.floor(totalCalc))}원\n총 수익률: ${_.round(
+						(totalStockValue / totalMyValue) * 100,
+						2,
+					)}%`,
 				);
 
 			await interaction.reply({ embeds: [embedBox] });
