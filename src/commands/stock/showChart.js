@@ -65,6 +65,7 @@ module.exports = {
 			const type = 'stock';
 			const stickPerCnt = stickTime / (type === 'stock' ? 2 : 0.5);
 			let historyStartIdx = stockInfo.updHistory.length - stickPerCnt * 30;
+			let beforeHistory = '';
 			historyStartIdx = historyStartIdx < 0 ? 0 : historyStartIdx;
 			for (
 				historyStartIdx;
@@ -76,15 +77,17 @@ module.exports = {
 					historyStartIdx + stickPerCnt,
 				);
 				const valueList = stickData.map(data => data.value);
+				beforeHistory && valueList.unshift(beforeHistory);
 				const stickValue =
 					chartType === 'stick'
 						? [
-								stickData[0].value,
-								stickData.at(-1).value,
+								valueList[0],
+								valueList.at(-1),
 								Math.min(...valueList),
 								Math.max(...valueList),
 						  ]
-						: stickData.at(-1).value;
+						: valueList.at(-1);
+				beforeHistory = valueList.at(-1);
 				chartOptions.xAxis.data.push(dayjs(stickData[0].date).format('MM.DD'));
 				chartOptions.series[0].data.push(stickValue);
 			}
