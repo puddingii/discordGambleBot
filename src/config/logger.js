@@ -1,6 +1,7 @@
 const winston = require('winston');
 const WinstonDaily = require('winston-daily-rotate-file');
 const path = require('path');
+const { nodeEnv } = require('./secretKey');
 
 const logDir = path.resolve(__dirname, '../../log'); // logs 디렉토리 하위에 로그 파일 저장
 const { combine, timestamp, printf, colorize, simple } = winston.format;
@@ -44,7 +45,7 @@ const logger = winston.createLogger({
 });
 
 // Production 환경이 아닌 경우(dev 등)
-if (process.env.NODE_ENV !== 'production') {
+if (nodeEnv !== 'production') {
 	logger.add(
 		new winston.transports.Console({
 			format: winston.format.combine(colorize(), simple()),

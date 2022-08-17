@@ -33,6 +33,10 @@ const User = new mongoose.Schema({
 			},
 		},
 	],
+	weapon: {
+		type: mongoose.Schema.Types.ObjectId,
+		ref: 'Weapon'
+	}
 });
 
 /**
