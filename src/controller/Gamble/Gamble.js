@@ -1,6 +1,6 @@
 const _ = require('lodash');
 const Condition = require('./ExternalOption/Condition');
-const User = require('./User');
+const Game = require('../Game');
 
 /**
  * @typedef {import('./Coin')} Coin
@@ -11,17 +11,14 @@ const User = require('./User');
 
 module.exports = class Gamble {
 	/**
-	 * @param {User[]} userList
 	 * @param {Coin[]} coinList
 	 * @param {Stock[]} stockList
 	 */
-	constructor(userList, coinList, stockList) {
+	constructor(coinList, stockList) {
 		/** @type {Array<Coin>} */
 		this.coinList = coinList ?? [];
 		/** @type {Array<Stock>} */
 		this.stockList = stockList ?? [];
-		/** @type {Array<User>} */
-		this.userList = userList ?? [];
 		this.conditionRatioPerList = [4, 16, 16, 4];
 		this.curCondition = 0;
 		this.curTime = 0;
@@ -44,20 +41,6 @@ module.exports = class Gamble {
 	}
 
 	/**
-	 * @param {{ id: string, nickname: string }} myInfo
-	 * @return {DefaultResult}
-	 */
-	addUser(myInfo) {
-		const isExistUser = this.userList.find(userInfo => userInfo.getId() === myInfo.id);
-		if (isExistUser) {
-			return { code: 0, message: '이미 있는 유저입니다.' };
-		}
-		const user = new User(myInfo);
-		this.userList.push(user);
-		return { code: 1 };
-	}
-
-	/**
 	 * @param {string} userId 디스코드 아이디
 	 * @param {string} stockName 주식 이름
 	 * @param {number} cnt 팔고살 주식 갯수, 파는거면 마이너스값
@@ -65,7 +48,7 @@ module.exports = class Gamble {
 	 * @returns {DefaultResult & { cnt?: number, value?: number, money?: number }}
 	 */
 	buySellStock(userId, stockName, cnt, isFull) {
-		const userInfo = this.userList.find(user => user.getId() === userId);
+		const userInfo = Game.getUser(userId);
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}
@@ -101,7 +84,7 @@ module.exports = class Gamble {
 	 * @return {{ stockList: {name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number}[], totalMyValue: number, totalStockValue: number}}
 	 */
 	getMyStock(myDiscordId) {
-		const user = this.userList.find(userInfo => userInfo.getId() === myDiscordId);
+		const user = Game.getUser(myDiscordId);
 		if (!user) {
 			return { code: 1, message: '유저정보를 찾을 수 없습니다.' };
 		}
@@ -166,7 +149,7 @@ module.exports = class Gamble {
 		});
 		// 주식 배당금
 		if (this.curTime % 48 === 0) {
-			updUserList = this.userList.filter(user => {
+			updUserList = Game.userList.filter(user => {
 				const result = user.giveDividend();
 				return !!result.code;
 			});
@@ -201,7 +184,7 @@ module.exports = class Gamble {
 	 * @returns {DefaultResult & { userInfo?: Stock }}
 	 */
 	updateMoney(userId, value) {
-		const userInfo = this.userList.find(user => user.getId() === userId);
+		const userInfo = Game.getUser(userId);
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}

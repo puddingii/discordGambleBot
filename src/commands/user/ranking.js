@@ -16,7 +16,7 @@ module.exports = {
 	async execute(interaction, game) {
 		try {
 			/** Discord Info */
-			const rankingList = game.gamble.userList.map(user => {
+			const rankingList = game.getUserList().map(user => {
 				const money =
 					user.stockList.reduce((acc, cur) => {
 						acc += cur.cnt * cur.stock.value;

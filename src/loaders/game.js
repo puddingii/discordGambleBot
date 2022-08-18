@@ -53,8 +53,8 @@ module.exports = async () => {
 		});
 	});
 
-	const gamble = new Gamble(userList, coinList, stockList);
-	const game = new Game(gamble);
+	const gamble = new Gamble(coinList, stockList);
+	const game = new Game(gamble, userList);
 	setInterval(() => {
 		/** 12시간마다 컨디션 조정 */
 		if (game.gamble.curTime % game.gamble.conditionPeriod === 0) {
