@@ -5,7 +5,7 @@ const Game = require('../Game');
 /**
  * @typedef {import('./Coin')} Coin
  * @typedef {import('./Stock')} Stock
- * @typedef {import('./User')} User
+ * @typedef {import('../User')} User
  * @typedef {{ code: number, message?: string }} DefaultResult
  */
 

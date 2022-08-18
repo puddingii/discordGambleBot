@@ -35,8 +35,8 @@ const User = new mongoose.Schema({
 	],
 	weapon: {
 		type: mongoose.Schema.Types.ObjectId,
-		ref: 'Weapon'
-	}
+		ref: 'Weapon',
+	},
 });
 
 /**
@@ -88,7 +88,7 @@ User.statics.updateStock = async function (discordId, updStockInfo) {
 /**
  * 유저 머니 업데이트
  * @this import('mongoose').Model
- * @param {import('../controller/Gamble/User')[]} userList
+ * @param {import('../controller/User')[]} userList
  */
 User.statics.updateMoney = async function (userList) {
 	const updPromiseList = userList.map(async updUser => {

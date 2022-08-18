@@ -1,13 +1,15 @@
+const User = require('./User');
+
 /**
  * @typedef {import('./Gamble/Coin')} Coin
  * @typedef {import('./Gamble/Stock')} Stock
- * @typedef {import('./Gamble/User')} User
+ * @typedef {import('./User')} User
  * @typedef {{ code: number, message?: string }} DefaultResult
  */
 
 module.exports = class Game {
 	static instance;
-	/** @type {import('./Gamble/User')[]} */
+	/** @type {import('./User')[]} */
 	static userList;
 
 	/**
@@ -21,7 +23,7 @@ module.exports = class Game {
 	/**
 	 * 싱글톤으로 관리
 	 * @param {import('./Gamble/Gamble')} gamble
-	 * @param {import('./Gamble/User')[]} userList
+	 * @param {import('./User')[]} userList
 	 */
 	constructor(gamble, userList) {
 		if (Game.instance) {

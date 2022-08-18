@@ -1,5 +1,5 @@
 /**
- * @typedef {import('./Stock') | import('./Coin')} stock
+ * @typedef {import('./Gamble/Stock') | import('./Gamble/Coin')} stock
  * @typedef {{ stock: stock, cnt: number, value: number}} userStockInfo
  * @typedef {{ code: number, message?: string }} DefaultResult
  */

@@ -1,6 +1,6 @@
 const Gamble = require('../controller/Gamble/Gamble');
 const Game = require('../controller/Game');
-const User = require('../controller/Gamble/User');
+const User = require('../controller/User');
 const Stock = require('../controller/Gamble/Stock');
 const Coin = require('../controller/Gamble/Coin');
 const {

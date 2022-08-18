@@ -1,6 +1,6 @@
 const ToolAbstract = require('./ToolAbstract');
 
-module.exports = class Weapon extends ToolAbstract {
+module.exports = class Sword extends ToolAbstract {
 	#hitRatio;
 	#missRatio;
 
