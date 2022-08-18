@@ -1,5 +1,6 @@
 /**
  * @typedef {import('./Gamble/Stock') | import('./Gamble/Coin')} stock
+ * @typedef {import('./Weapon/Sword')} weapon
  * @typedef {{ stock: stock, cnt: number, value: number}} userStockInfo
  * @typedef {{ code: number, message?: string }} DefaultResult
  */
@@ -7,13 +8,14 @@
 module.exports = class User {
 	#id;
 	/**
-	 * @param {{ id: string, nickname: string, money: number, stockList: userStockInfo[]}}
+	 * @param {{ id: string, nickname: string, money: number, stockList: userStockInfo[], weaponList: weapon[]}}
 	 */
-	constructor({ id, nickname, money, stockList }) {
+	constructor({ id, nickname, money, stockList, weaponList }) {
 		this.#id = id;
 		this.nickname = nickname;
 		this.money = money ?? 1000000;
 		this.stockList = stockList ?? [];
+		this.weaponList = weaponList ?? [];
 	}
 
 	/** 유저 디스코드 아이디 가져오기 */
@@ -48,7 +50,7 @@ module.exports = class User {
 
 	/**
 	 * @param {Number} money
-	 * @param {'stock' | 'coin'} type
+	 * @param {'stock' | 'coin' | 'weapon'} type
 	 * @return {DefaultResult}
 	 */
 	updateMoney(money, type) {
