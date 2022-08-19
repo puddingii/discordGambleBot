@@ -1,5 +1,13 @@
 module.exports = new (class {
 	/**
+	 * min <= x < min + len
+	 * @param {number} len
+	 * @param {number} min
+	 */
+	getRandomNumber(len, min = 0) {
+		return Math.floor(Math.random() * len) + min;
+	}
+	/**
 	 * 세자리수마다 컴마 찍어주기
 	 * @param {string | number} num
 	 * @param {boolean} isRemoveDecimal

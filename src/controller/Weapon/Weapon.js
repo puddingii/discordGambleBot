@@ -1,5 +1,10 @@
 const Game = require('../Game');
 const Sword = require('./Sword');
+const {
+	cradle: {
+		util: { getRandomNumber },
+	},
+} = require('../../config/dependencyInjection');
 /**
  * @typedef {import('./Sword')} Sword
  * @typedef {{ code: number, message?: string }} DefaultResult
@@ -36,12 +41,12 @@ module.exports = class Weapon {
 
 	/**
 	 * @param {string} userId 디스코드 아이디
-	 * @param {string} stockName 주식 이름
-	 * @param {number} cnt 팔고살 주식 갯수, 파는거면 마이너스값
-	 * @param {boolean} isFull
+	 * @param {string} type 무기 타입
+	 * @param {boolean} isPreventDestroy 파괴방지 할건지
+	 * @param {boolean} isPreventDown
 	 * @returns {DefaultResult & { cnt?: number, value?: number, money?: number }}
 	 */
-	enhanceWeapon(userId, type, isPrevent) {
+	enhanceWeapon(userId, type, isPreventDestroy, isPreventDown) {
 		const userInfo = Game.getUser(userId);
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
@@ -57,11 +62,24 @@ module.exports = class Weapon {
 			userInfo.weaponList.push(myWeapon);
 		}
 
-		const cost =
-			this[`${type}Info`].ratioList.slice(0, myWeapon.curPower + 1).reduce((acc, cur) => {
+		let cost = this[`${type}Info`].ratioList
+			.slice(0, myWeapon.curPower + 1)
+			.reduce((acc, cur) => {
 				return acc * cur.moneyRatio;
-			}, this[`${type}Info`].value) * (isPrevent ? 2 : 1);
+			}, this[`${type}Info`].value);
+		cost += isPreventDestroy ? cost : 0;
+		cost += isPreventDown ? cost * 0.5 : 0;
 
-		userInfo.updateMoney();
+		const moneyResult = userInfo.updateMoney(-1 * cost, 'weapon');
+		if (!moneyResult.code) {
+			return moneyResult;
+		}
+
+		const randomNum = getRandomNumber(1000);
+		const { failRatio, destroyRatio } = this[`${type}Info`].ratioList[myWeapon.curPower];
+		let randomResult = 2;
+		[failRatio, destroyRatio].forEach(ratio => {
+			1000 * failRatio;
+		});
 	}
 };
