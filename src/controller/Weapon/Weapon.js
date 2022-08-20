@@ -75,11 +75,28 @@ module.exports = class Weapon {
 			return moneyResult;
 		}
 
-		const randomNum = getRandomNumber(1000);
+		const MAX_NUMBER = 1000;
+		const randomNum = getRandomNumber(MAX_NUMBER, 1);
 		const { failRatio, destroyRatio } = this[`${type}Info`].ratioList[myWeapon.curPower];
-		let randomResult = 2;
-		[failRatio, destroyRatio].forEach(ratio => {
-			1000 * failRatio;
-		});
+		// 실패
+		if (failRatio * MAX_NUMBER >= randomNum) {
+			myWeapon.failCnt++;
+			if (!isPreventDown && myWeapon.curPower > 0) {
+				myWeapon.curPower--;
+			}
+			return { code: -1, myWeapon };
+		}
+		if ((failRatio + destroyRatio) * MAX_NUMBER >= randomNum) {
+			// 터짐
+			if (!isPreventDestroy) {
+				myWeapon.curPower = 0;
+				myWeapon.destroyCnt++;
+			}
+			return { code: -2, myWeapon };
+		}
+
+		myWeapon.curPower++;
+		myWeapon.successCnt++;
+		return { code: 1, myWeapon };
 	}
 };
