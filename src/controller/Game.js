@@ -24,13 +24,15 @@ module.exports = class Game {
 	 * 싱글톤으로 관리
 	 * @param {import('./Gamble/Gamble')} gamble
 	 * @param {import('./User')[]} userList
+	 * @param {import('./Weapon/Weapon')} weapon
 	 */
-	constructor(gamble, userList) {
+	constructor(userList, gamble, weapon) {
 		if (Game.instance) {
 			// eslint-disable-next-line no-constructor-return
 			return Game.instance;
 		}
 		this.gamble = gamble;
+		this.weapon = weapon;
 		Game.userList = userList;
 		Game.instance = this;
 	}

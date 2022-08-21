@@ -41,12 +41,12 @@ module.exports = class Weapon {
 
 	/**
 	 * @param {string} userId 디스코드 아이디
-	 * @param {string} type 무기 타입
+	 * @param {'sword'} type 무기 타입
 	 * @param {boolean} isPreventDestroy 파괴방지 할건지
 	 * @param {boolean} isPreventDown
-	 * @returns {DefaultResult & { cnt?: number, value?: number, money?: number }}
+	 * @returns {DefaultResult & { myWeapon: Sword, money: number }}
 	 */
-	enhanceWeapon(userId, type, isPreventDestroy, isPreventDown) {
+	enhanceWeapon(userId, type, isPreventDestroy = false, isPreventDown = false) {
 		const userInfo = Game.getUser(userId);
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
@@ -54,7 +54,7 @@ module.exports = class Weapon {
 		let myWeapon = userInfo.weaponList.find(weapon => weapon.type === type);
 		if (!myWeapon) {
 			switch (type) {
-				case 'weapon':
+				case 'sword':
 					myWeapon = new Sword();
 					break;
 				default:
@@ -62,13 +62,13 @@ module.exports = class Weapon {
 			userInfo.weaponList.push(myWeapon);
 		}
 
+		// 강화비용 계산
 		let cost = this[`${type}Info`].ratioList
 			.slice(0, myWeapon.curPower + 1)
 			.reduce((acc, cur) => {
 				return acc * cur.moneyRatio;
 			}, this[`${type}Info`].value);
-		cost += isPreventDestroy ? cost : 0;
-		cost += isPreventDown ? cost * 0.5 : 0;
+		cost += (isPreventDestroy ? cost * 2 : 0) + (isPreventDown ? cost : 0);
 
 		const moneyResult = userInfo.updateMoney(-1 * cost, 'weapon');
 		if (!moneyResult.code) {
@@ -76,6 +76,7 @@ module.exports = class Weapon {
 		}
 
 		const MAX_NUMBER = 1000;
+		const money = userInfo.money;
 		const randomNum = getRandomNumber(MAX_NUMBER, 1);
 		const { failRatio, destroyRatio } = this[`${type}Info`].ratioList[myWeapon.curPower];
 		// 실패
@@ -84,19 +85,19 @@ module.exports = class Weapon {
 			if (!isPreventDown && myWeapon.curPower > 0) {
 				myWeapon.curPower--;
 			}
-			return { code: -1, myWeapon };
+			return { code: 2, myWeapon, money };
 		}
+		// 터짐
 		if ((failRatio + destroyRatio) * MAX_NUMBER >= randomNum) {
-			// 터짐
 			if (!isPreventDestroy) {
 				myWeapon.curPower = 0;
 				myWeapon.destroyCnt++;
 			}
-			return { code: -2, myWeapon };
+			return { code: 3, myWeapon, money };
 		}
 
 		myWeapon.curPower++;
 		myWeapon.successCnt++;
-		return { code: 1, myWeapon };
+		return { code: 1, myWeapon, money };
 	}
 };

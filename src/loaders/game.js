@@ -3,6 +3,7 @@ const Game = require('../controller/Game');
 const User = require('../controller/User');
 const Stock = require('../controller/Gamble/Stock');
 const Coin = require('../controller/Gamble/Coin');
+const Weapon = require('../controller/Weapon/Weapon');
 const {
 	cradle: { UserModel, StockModel },
 } = require('../config/dependencyInjection');
@@ -53,8 +54,9 @@ module.exports = async () => {
 		});
 	});
 
+	const weapon = new Weapon();
 	const gamble = new Gamble(coinList, stockList);
-	const game = new Game(gamble, userList);
+	const game = new Game(userList, gamble, weapon);
 	setInterval(() => {
 		/** 12시간마다 컨디션 조정 */
 		if (game.gamble.curTime % game.gamble.conditionPeriod === 0) {

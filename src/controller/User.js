@@ -29,9 +29,15 @@ module.exports = class User {
 	 * @return {userStockInfo | undefined}
 	 */
 	getStock(name) {
-		return this.stockList.find(stockInfo => {
-			return stockInfo.stock.name === name;
-		});
+		return this.stockList.find(stockInfo => stockInfo.stock.name === name);
+	}
+
+	/**
+	 * 가지고 있는 무기 가져오기
+	 * @param {string} type
+	 */
+	getWeapon(type) {
+		return this.weaponList.find(weaponInfo => weaponInfo.type === type);
 	}
 
 	/** 가지고 있는 주식들 배당금 지급
