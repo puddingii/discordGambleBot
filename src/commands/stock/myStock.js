@@ -62,7 +62,7 @@ module.exports = {
 					totalStockValue,
 					true,
 				)}원\n총 수익: ${util.setComma(totalCalc, true)}원\n총 수익률: ${_.round(
-					((totalStockValue - totalMyValue) / totalStockValue) * 100,
+					(totalCalc / totalStockValue) * 100,
 					2,
 				)}%`,
 			});
