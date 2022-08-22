@@ -13,4 +13,12 @@ module.exports = class Sword extends ToolAbstract {
 		this.#hitRatio = weaponInfo?.hitRatio ?? 1;
 		this.#missRatio = weaponInfo?.missRatio ?? 0;
 	}
+
+	getHitRatio() {
+		return this.#hitRatio;
+	}
+
+	getMissRatio() {
+		return this.#missRatio;
+	}
 };

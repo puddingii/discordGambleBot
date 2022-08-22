@@ -4,6 +4,7 @@ const User = require('../controller/User');
 const Stock = require('../controller/Gamble/Stock');
 const Coin = require('../controller/Gamble/Coin');
 const Weapon = require('../controller/Weapon/Weapon');
+const Sword = require('../controller/Weapon/Sword');
 const {
 	cradle: { UserModel, StockModel },
 } = require('../config/dependencyInjection');
@@ -33,7 +34,7 @@ module.exports = async () => {
 	let userList = await UserModel.find({}).populate('stockList.stock');
 	userList = userList.map(user => {
 		/** stock정보에 해당하는 class 불러와서 init */
-		const myList = user.stockList.reduce((acc, stockInfo) => {
+		const myStockList = user.stockList.reduce((acc, stockInfo) => {
 			const {
 				stock: { type, name },
 				cnt,
@@ -46,11 +47,17 @@ module.exports = async () => {
 			}
 			return acc;
 		}, []);
+
+		const weaponList = user.weaponList.map(weapon => {
+			return new Sword(weapon._doc);
+		});
+
 		return new User({
 			id: user.discordId,
 			nickname: user.nickname,
 			money: user.money,
-			stockList: myList,
+			stockList: myStockList,
+			weaponList,
 		});
 	});
 

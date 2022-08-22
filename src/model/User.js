@@ -35,8 +35,48 @@ const User = new mongoose.Schema({
 	],
 	weaponList: [
 		{
-			type: mongoose.Schema.Types.ObjectId,
-			ref: 'Weapon',
+			/** 타입 weapon or pickaxe */
+			type: {
+				type: String,
+				required: true,
+			},
+			/** 터진수 */
+			destroyCnt: {
+				type: Number,
+				default: 0,
+			},
+			/** 실패수 */
+			failCnt: {
+				type: Number,
+				default: 0,
+			},
+			/** 성공수 */
+			successCnt: {
+				type: Number,
+				default: 0,
+			},
+			/** 현재 강화된 정도(파워는 강화된 수 * 3) */
+			curPower: {
+				type: Number,
+				default: 0,
+			},
+			/** 추가 파워 */
+			bonusPower: {
+				type: Number,
+				default: 0,
+			},
+			/** 최대 적중률은 300% */
+			hitRatio: {
+				type: Number,
+				default: 1,
+				max: 3,
+			},
+			/** 최대 회피율은 70% */
+			missRatio: {
+				type: Number,
+				default: 0,
+				max: 0.7,
+			},
 		},
 	],
 });
@@ -52,7 +92,7 @@ User.statics.findByDiscordId = async function (discordId) {
 };
 
 /**
- * 아이디로 유저정보 탐색
+ * 주식정보 업데이트
  * @this import('mongoose').Model
  * @param {string} discordId
  * @param {{ name: string, cnt: string, value: number, money: number }} updStockInfo
@@ -106,6 +146,49 @@ User.statics.updateMoney = async function (userList) {
 			logger.error(`${result.reason}`);
 		}
 	});
+	return { code: 1 };
+};
+
+/**
+ * 무기 업데이트
+ * @this import('mongoose').Model
+ * @param {string} discordId
+ * @param {import('../controller/Weapon/Sword')} updWeaponInfo
+ * @param {number} money
+ */
+User.statics.updateWeapon = async function (discordId, updWeaponInfo, money) {
+	const userInfo = await this.findOne({ discordId });
+	if (!userInfo) {
+		return { code: 0, message: '[DB]유저정보를 찾을 수 없습니다.' };
+	}
+
+	const myWeapon = userInfo.weaponList.find(weapon => {
+		return weapon.type === updWeaponInfo.type;
+	});
+
+	if (myWeapon) {
+		myWeapon.bonusPower = updWeaponInfo.bonusPower;
+		myWeapon.curPower = updWeaponInfo.curPower;
+		myWeapon.destroyCnt = updWeaponInfo.destroyCnt;
+		myWeapon.failCnt = updWeaponInfo.failCnt;
+		myWeapon.successCnt = updWeaponInfo.successCnt;
+		myWeapon.hitRatio = updWeaponInfo.getHitRatio();
+		myWeapon.missRatio = updWeaponInfo.getMissRatio();
+	} else {
+		userInfo.weaponList.push({
+			type: updWeaponInfo.type,
+			curPower: updWeaponInfo.curPower,
+			failCnt: updWeaponInfo.failCnt,
+			successCnt: updWeaponInfo.successCnt,
+			destroyCnt: updWeaponInfo.destroyCnt,
+			bonusPower: updWeaponInfo.bonusPower,
+			hitRatio: updWeaponInfo.getHitRatio(),
+			missRatio: updWeaponInfo.getMissRatio(),
+		});
+	}
+	userInfo.money = money;
+
+	await userInfo.save();
 	return { code: 1 };
 };
 
