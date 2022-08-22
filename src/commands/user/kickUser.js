@@ -26,7 +26,7 @@ module.exports = {
 			const user = interaction.options.getUser('유저');
 			const selectedChannel = interaction.options.getChannel('채널');
 			const kickedUser = interaction.channel.members.get(user.id);
-			kickedUser.voice.disconnect('ㅋㅋ');
+			// kickedUser.voice.disconnect('ㅋㅋ');
 
 			await interaction.reply({ content: '테스트' });
 		} catch (err) {
