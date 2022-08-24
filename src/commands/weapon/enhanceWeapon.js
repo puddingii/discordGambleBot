@@ -35,7 +35,7 @@ module.exports = {
 				isPreventFail,
 			);
 
-			if (code === -1) {
+			if (!code) {
 				await interaction.reply({ content: message });
 				return;
 			}
