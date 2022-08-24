@@ -1,3 +1,4 @@
+const { InteractionType } = require('discord.js');
 const {
 	cradle: { logger },
 } = require('../config/dependencyInjection');
@@ -14,7 +15,7 @@ module.exports = {
 			commandName,
 			user: { username },
 		} = interaction;
-		if (!interaction.isCommand()) {
+		if (interaction.type !== InteractionType.ApplicationCommand) {
 			return;
 		}
 

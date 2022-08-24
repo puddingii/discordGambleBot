@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, MessageEmbed } = require('discord.js');
 const dayjs = require('dayjs');
 const _ = require('lodash');
 const {

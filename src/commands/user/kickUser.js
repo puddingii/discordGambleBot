@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const { ChannelType } = require('discord-api-types/v9');
 const {
 	cradle: { UserModel, logger },

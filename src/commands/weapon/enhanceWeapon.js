@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const _ = require('lodash');
 const {
 	cradle: { UserModel, logger },

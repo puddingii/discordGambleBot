@@ -1,4 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
+const { SlashCommandBuilder } = require('discord.js');
 const {
 	cradle: { StockModel, logger, secretKey },
 } = require('../../config/dependencyInjection');

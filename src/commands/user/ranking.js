@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, MessageEmbed } = require('discord.js');
 const {
 	cradle: { logger },
 } = require('../../config/dependencyInjection');
@@ -22,7 +21,11 @@ module.exports = {
 						acc += cur.cnt * cur.stock.value;
 						return acc;
 					}, 0) + user.money;
-				return { name: user.nickname, money, sword: user.getWeapon('sword')?.curPower ?? 0 };
+				return {
+					name: user.nickname,
+					money,
+					sword: user.getWeapon('sword')?.curPower ?? 0,
+				};
 			});
 
 			const embedBox = new MessageEmbed();
