@@ -22,7 +22,7 @@ module.exports = {
 						acc += cur.cnt * cur.stock.value;
 						return acc;
 					}, 0) + user.money;
-				return { name: user.nickname, money };
+				return { name: user.nickname, money, sword: user.getWeapon('sword')?.curPower ?? 0 };
 			});
 
 			const embedBox = new MessageEmbed();
@@ -36,7 +36,7 @@ module.exports = {
 			rankingList.forEach(user => {
 				embedBox.addFields({
 					name: `${user.name}`,
-					value: `${setComma(user.money, true)}원`,
+					value: `총 재산: ${setComma(user.money, true)}원\n무기: ${user.sword}강`,
 					inline: true,
 				});
 			});
