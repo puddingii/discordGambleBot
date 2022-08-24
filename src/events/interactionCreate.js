@@ -14,7 +14,11 @@ module.exports = {
 			commandName,
 			user: { username },
 		} = interaction;
-		if (!interaction.isCommand()) {
+		if (interaction.isSelectMenu()) {
+			console.log(interaction);
+			return;
+		}
+		if (!interaction.isCommand() && !interaction.isSelectMenu()) {
 			return;
 		}
 
