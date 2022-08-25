@@ -12,8 +12,9 @@ module.exports = {
 	mongoPw: process.env.MONGO_PW,
 	clientId: process.env.CLIENT_ID,
 	guildId: process.env.GUILD_ID,
+	adminId: process.env.ADMIN_ID,
 	adminPw: process.env.ADMIN_PW,
 	stockUpdateTime: parseInt(process.env.STOCK_UPDATE_TIME, 10),
 	imgServer: process.env.IMG_SERVER,
-	isDocker: process.env.IS_DOCKER ?? ''
+	isDocker: process.env.IS_DOCKER ?? '',
 };

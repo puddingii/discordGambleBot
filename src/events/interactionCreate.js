@@ -1,4 +1,3 @@
-const _ = require('lodash');
 const {
 	cradle: { logger },
 } = require('../config/dependencyInjection');
@@ -23,7 +22,7 @@ module.exports = {
 		}
 
 		const commandName = interaction.customId
-			? interaction.customId
+			? interaction.customId.split('-')[0]
 			: interaction.commandName;
 		const command = interaction.client.commands.get(commandName);
 
@@ -42,7 +41,7 @@ module.exports = {
 		try {
 			let logMessage = '';
 			if (interaction.isSelectMenu()) {
-				await command.select(interaction, game, interaction.values);
+				await command.select(interaction, game, { selectedList: interaction.values });
 				logMessage = `[interactionCreate-selectMenu]${username} - ${commandName}${interaction.values}`;
 			} else if (interaction.isModalSubmit()) {
 				await command.modalSubmit(interaction, game);
