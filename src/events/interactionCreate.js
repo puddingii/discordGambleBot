@@ -1,3 +1,4 @@
+const _ = require('lodash');
 const {
 	cradle: { logger },
 } = require('../config/dependencyInjection');
@@ -11,17 +12,19 @@ module.exports = {
 	 */
 	async execute(interaction, game) {
 		const {
-			commandName,
 			user: { username },
 		} = interaction;
-		if (interaction.isSelectMenu()) {
-			console.log(interaction);
-			return;
-		}
-		if (!interaction.isCommand() && !interaction.isSelectMenu()) {
+		if (
+			!interaction.isCommand() &&
+			!interaction.isSelectMenu() &&
+			!interaction.isModalSubmit()
+		) {
 			return;
 		}
 
+		const commandName = interaction.customId
+			? interaction.customId
+			: interaction.commandName;
 		const command = interaction.client.commands.get(commandName);
 
 		if (!command) {
@@ -37,14 +40,20 @@ module.exports = {
 		}
 
 		try {
-			await command.execute(interaction, game);
-			logger.info(`[interactionCreate]${username} - ${commandName}`);
+			let logMessage = '';
+			if (interaction.isSelectMenu()) {
+				await command.select(interaction, game, interaction.values);
+				logMessage = `[interactionCreate-selectMenu]${username} - ${commandName}${interaction.values}`;
+			} else if (interaction.isModalSubmit()) {
+				await command.modalSubmit(interaction, game);
+				logMessage = `[interactionCreate-modalSubmit]${username} - ${commandName}[Modal]`;
+			} else {
+				await command.execute(interaction, game);
+				logMessage = `[interactionCreate]${username} - ${commandName}`;
+			}
+			logger.info(logMessage);
 		} catch (error) {
 			logger.error(error);
-			await interaction.reply({
-				content: 'There was an error while executing this command!',
-				ephemeral: true,
-			});
 		}
 	},
 };
