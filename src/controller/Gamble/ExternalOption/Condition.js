@@ -7,6 +7,7 @@ module.exports = class Condition {
 	}
 
 	getRandomRatio() {
-		return randomRatio + this.stock.beforeHistoryRatio > 0 ? -0.03 : 0.03;
+		const randomRatio = this.stock.getRandomRatio();
+		return randomRatio + (this.stock.beforeHistoryRatio > 0 ? -0.03 : 0.03);
 	}
 };
