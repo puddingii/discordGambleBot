@@ -6,12 +6,12 @@ module.exports = class StockAbstract {
 
 	/**
 	 * @param {Object} stockInfo
-	 * @param {{min: number, max: number}} stockInfo.ratio
-	 * @param {string} stockInfo.name
-	 * @param {number} stockInfo.value
-	 * @param {'stock' | 'coin'} stockInfo.type
-	 * @param {number} stockInfo.updateTime
-	 * @param {number} stockInfo.correctionCnt
+	 * @param {{min: number, max: number}} stockInfo.ratio 최소최대 확률
+	 * @param {string} stockInfo.name 이름
+	 * @param {number} stockInfo.value 값
+	 * @param {'stock' | 'coin'} stockInfo.type 타입
+	 * @param {number} stockInfo.updateTime 업데이트주기
+	 * @param {number} stockInfo.correctionCnt 조정주기
 	 */
 	constructor({ ratio, name, value, type, updateTime, correctionCnt, comment }) {
 		this.#ratio = ratio;

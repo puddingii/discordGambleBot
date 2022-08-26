@@ -41,10 +41,15 @@ module.exports = {
 		try {
 			let logMessage = '';
 			if (interaction.isSelectMenu()) {
-				await command.select(interaction, game, { selectedList: interaction.values });
+				await command.select(interaction, game, {
+					selectedList: interaction.values,
+					callFuncName: interaction.customId.split('-')[1],
+				});
 				logMessage = `[interactionCreate-selectMenu]${username} - ${commandName}${interaction.values}`;
 			} else if (interaction.isModalSubmit()) {
-				await command.modalSubmit(interaction, game);
+				await command.modalSubmit(interaction, game, {
+					callFuncName: interaction.customId.split('-')[1],
+				});
 				logMessage = `[interactionCreate-modalSubmit]${username} - ${commandName}[Modal]`;
 			} else {
 				await command.execute(interaction, game);

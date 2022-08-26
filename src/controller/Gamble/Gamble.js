@@ -115,11 +115,16 @@ module.exports = class Gamble {
 
 	/**
 	 * 주식/코인 리스트에서 name에 해당하는 정보 가져오기
-	 * @param {'stock' | 'coin'} type
+	 * @param {'stock' | 'coin' | ''} type
 	 * @param {string} name
 	 * @returns {Stock | Coin | undefined}
 	 */
 	getStock(type, name) {
+		if (!type) {
+			return this.stockList.concat(this.coinList).find(stock => {
+				return stock.name === name;
+			});
+		}
 		return this[`${type}List`].find(stock => {
 			return stock.name === name;
 		});
