@@ -42,6 +42,37 @@ const addStock = async interaction => {
 	await interaction.showModal(modal);
 };
 
+const updateStock = async interaction => {
+	const modal = new Modal().setCustomId('어드민-updateStock').setTitle('주식업데이트');
+	const nameType = new TextInputComponent()
+		.setCustomId('nameType')
+		.setLabel('주식이름/종류')
+		.setStyle('SHORT');
+	const value = new TextInputComponent()
+		.setCustomId('value')
+		.setLabel('처음가격')
+		.setStyle('SHORT');
+	const ratio = new TextInputComponent()
+		.setCustomId('ratio')
+		.setLabel('최소/최대/배당퍼센트/조정주기(n*30분)')
+		.setStyle('SHORT');
+	const conditionList = new TextInputComponent()
+		.setCustomId('conditionList')
+		.setLabel('컨디션 - 아무일도없음/씹악재/악재/호재/씹호재')
+		.setStyle('SHORT');
+	const comment = new TextInputComponent()
+		.setCustomId('comment')
+		.setLabel('설명')
+		.setStyle('PARAGRAPH');
+
+	const actionRows = [nameType, value, ratio, conditionList, comment].map(row =>
+		new MessageActionRow().addComponents(row),
+	);
+	// Add inputs to the modal
+	modal.addComponents(...actionRows);
+	await interaction.showModal(modal);
+};
+
 const getNewSelectMenu = () => {
 	return new MessageActionRow().addComponents(
 		new MessageSelectMenu()
@@ -54,9 +85,9 @@ const getNewSelectMenu = () => {
 					value: 'addStock',
 				},
 				{
-					label: 'DB불러오기',
-					description: 'DB정보로 다시 Class갱신',
-					value: 'loadDB',
+					label: '주식정보업데이트',
+					description: '주식정보 강제 업데이트',
+					value: 'selectStock',
 				},
 			]),
 	);
@@ -107,11 +138,38 @@ module.exports = {
 	 */
 	async select(interaction, game, { selectedList }) {
 		try {
-			switch (selectedList[0]) {
+			const command = selectedList[0].split('-');
+			switch (command[0]) {
 				case 'addStock':
 					await addStock(interaction);
 					break;
-				case 'loadDB':
+				case 'selectStock':
+					await interaction.reply({
+						content: 'Admin Options',
+						components: [
+							new MessageActionRow().addComponents(
+								new MessageSelectMenu()
+									.setCustomId('어드민')
+									.setPlaceholder('Nothing selected')
+									.addOptions([
+										{
+											label: '111',
+											description: 'This is a description',
+											value: 'updateStock-1', // format: [select command 명령어-callback]
+										},
+										{
+											label: '222',
+											description: '주식정보 강제 업데이트',
+											value: 'updateStock-2',
+										},
+									]),
+							),
+						],
+						ephemeral: true,
+					});
+					break;
+				case 'updateStock':
+					await updateStock(interaction);
 					break;
 				default:
 					break;
