@@ -20,7 +20,7 @@ const getNewSelectMenu = () => {
 				{
 					label: '주식추가',
 					description: 'This is a description',
-					value: 'showStockModal',
+					value: 'showAddStockModal',
 				},
 				{
 					label: '주식정보업데이트',
@@ -37,36 +37,44 @@ const getNewSelectMenu = () => {
  * @param {string} stockName
  */
 const showStockModal = async (interaction, game, stockName) => {
-	const stock = game.gamble.getStock('', stockName);
 	const modal = new Modal()
-		.setCustomId('어드민-updateStock')
+		.setCustomId(`어드민-${stockName ? 'updateStock' : 'addStock'}`)
 		.setTitle('주식 추가/업데이트');
+
 	const nameType = new TextInputComponent()
 		.setCustomId('nameType')
 		.setLabel('주식이름/종류')
-		.setStyle('SHORT')
-		.setValue(`${stock.name}/${stock.type}`);
+		.setStyle('SHORT');
+
 	const value = new TextInputComponent()
 		.setCustomId('value')
 		.setLabel('처음가격')
-		.setStyle('SHORT')
-		.setValue(`${stock.value}`);
-	const { min, max } = stock.getRatio();
+		.setStyle('SHORT');
+
 	const ratio = new TextInputComponent()
 		.setCustomId('ratio')
 		.setLabel('최소/최대/배당퍼센트/조정주기(n*30분)')
-		.setStyle('SHORT')
-		.setValue(`${min}/${max}/${stock.dividend}/${stock.correctionCnt}`);
+		.setStyle('SHORT');
+
 	const conditionList = new TextInputComponent()
 		.setCustomId('conditionList')
 		.setLabel('컨디션 - 아무일도없음/씹악재/악재/호재/씹호재')
-		.setStyle('SHORT')
-		.setValue(`${stock?.conditionList.join('/')}`);
+		.setStyle('SHORT');
+
 	const comment = new TextInputComponent()
 		.setCustomId('comment')
 		.setLabel('설명')
-		.setStyle('PARAGRAPH')
-		.setValue(`${stock.comment}`);
+		.setStyle('PARAGRAPH');
+
+	if (stockName) {
+		const stock = game.gamble.getStock('', stockName);
+		nameType.setValue(`${stock.name}/${stock.type}`);
+		value.setValue(`${stock.value}`);
+		const { min, max } = stock.getRatio();
+		ratio.setValue(`${min}/${max}/${stock.dividend}/${stock.correctionCnt}`);
+		conditionList.setValue(`${stock?.conditionList.join('/')}`);
+		comment.setValue(`${stock.comment}`);
+	}
 
 	const actionRows = [nameType, value, ratio, conditionList, comment].map(row =>
 		new MessageActionRow().addComponents(row),
@@ -76,12 +84,34 @@ const showStockModal = async (interaction, game, stockName) => {
 	await interaction.showModal(modal);
 };
 
+const chkStockOptions = param => {
+	const MAX_RATIO = 0.2;
+	if (param.conditionList.length !== 5) {
+		return { code: 0, message: '조정 퍼센트 입력형식이 이상합니다. 다시 입력해주세요.' };
+	}
+
+	const isOverMaxRatio = ratio => {
+		return Math.abs(ratio) > MAX_RATIO;
+	};
+
+	if (
+		isOverMaxRatio(param.minRatio) ||
+		isOverMaxRatio(param.maxRatio) ||
+		isOverMaxRatio(param.dividend) ||
+		param.conditionList.some(isOverMaxRatio)
+	) {
+		return { code: 0, message: '모든 비율은 +-0.2퍼센트 초과로 지정할 수 없습니다.' };
+	}
+
+	return { code: 1 };
+};
+
 /**
  * @param {import('discord.js').SelectMenuInteraction} interaction
  * @param {import('../controller/Game')} game
+ * @param {boolean} isNew
  */
-const addStock = async (interaction, game) => {
-	const MAX_RATIO = 0.2;
+const updateStock = async (interaction, game, isNew) => {
 	const [name, type] = interaction.fields.getTextInputValue('nameType').split('/');
 	const value = Number(interaction.fields.getTextInputValue('value'));
 	const [minRatio, maxRatio, dividend, correctionCnt] = interaction.fields
@@ -92,31 +122,6 @@ const addStock = async (interaction, game) => {
 		.split('/')
 		.map(Number);
 	const comment = interaction.fields.getTextInputValue('comment');
-
-	if (conditionList.length !== 5) {
-		await interaction.reply({
-			content: '조정 퍼센트 입력형식이 이상합니다. 다시 입력해주세요.',
-			ephemeral: true,
-		});
-		return;
-	}
-
-	const isOverMaxRatio = ratio => {
-		return Math.abs(ratio) > MAX_RATIO;
-	};
-
-	if (
-		isOverMaxRatio(minRatio) ||
-		isOverMaxRatio(maxRatio) ||
-		isOverMaxRatio(dividend) ||
-		conditionList.some(isOverMaxRatio)
-	) {
-		await interaction.reply({
-			content: '모든 비율은 +-0.2퍼센트 초과로 지정할 수 없습니다.',
-			ephemeral: true,
-		});
-		return;
-	}
 
 	const param = {
 		name,
@@ -129,18 +134,42 @@ const addStock = async (interaction, game) => {
 		conditionList,
 		dividend,
 	};
+	const { code, message } = chkStockOptions(param);
+	if (!code) {
+		await interaction.reply({
+			content: message,
+			components: [getNewSelectMenu()],
+			ephemeral: true,
+		});
+		return;
+	}
 	/** DB Info */
-	const result = await StockModel.addStock(param);
-
-	const content = result.code === 1 ? '등록완료!' : result.message;
-	if (result.code) {
-		const classParam = {
-			ratio: { min: param.minRatio, max: param.maxRatio },
-			...param,
-			updateTime: secretKey.stockUpdateTime,
-		};
+	const content = '';
+	const classParam = {
+		ratio: { min: param.minRatio, max: param.maxRatio },
+		...param,
+		updateTime: secretKey.stockUpdateTime,
+	};
+	if (isNew) {
 		const stock = type === 'stock' ? new Stock(classParam) : new Coin(classParam);
-		game.gamble.addStock(stock);
+		const gambleResult = game.gamble.addStock(stock);
+		if (!gambleResult.code) {
+			await interaction.reply({
+				content: gambleResult.message,
+				components: [getNewSelectMenu()],
+				ephemeral: true,
+			});
+			return;
+		}
+		const dbResult = await StockModel.addStock(param);
+		if (!dbResult.code) {
+			await interaction.reply({
+				content: dbResult.message,
+				components: [getNewSelectMenu()],
+				ephemeral: true,
+			});
+			return;
+		}
 	}
 
 	await interaction.reply({
@@ -202,7 +231,7 @@ module.exports = {
 				description: stock.type,
 			}));
 			switch (command[0]) {
-				case 'showStockModal':
+				case 'showAddStockModal':
 					await showStockModal(interaction);
 					break;
 				case 'selectStock':
@@ -239,7 +268,10 @@ module.exports = {
 		try {
 			switch (callFuncName) {
 				case 'addStock':
-					await addStock(interaction, game);
+					await updateStock(interaction, game, true);
+					break;
+				case 'updateStock':
+					await updateStock(interaction, game);
 					break;
 				default:
 			}
