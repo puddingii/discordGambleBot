@@ -117,7 +117,8 @@ const updateStock = async (interaction, game, isNew) => {
 		const value = Number(interaction.fields.getTextInputValue('value'));
 		const [minRatio, maxRatio, dividend, correctionCnt] = interaction.fields
 			.getTextInputValue('ratio')
-			.split('/');
+			.split('/')
+			.map(Number);
 		const conditionList = interaction.fields
 			.getTextInputValue('conditionList')
 			.split('/')
