@@ -155,7 +155,7 @@ Stock.statics.updateStock = async function (updatedStockInfo) {
 		}
 		stock[key] = updatedStockInfo[key];
 	});
-	await stock.update();
+	await stock.save();
 	return { code: 1 };
 };
 
