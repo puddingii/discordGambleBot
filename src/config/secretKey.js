@@ -17,4 +17,6 @@ module.exports = {
 	stockUpdateTime: parseInt(process.env.STOCK_UPDATE_TIME, 10),
 	imgServer: process.env.IMG_SERVER,
 	isDocker: process.env.IS_DOCKER ?? '',
+	/** 초 단위 */
+	gambleUpdateTime: parseInt(process.env.GAMBLE_UPDATE_TIME, 10),
 };

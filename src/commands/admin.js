@@ -43,7 +43,7 @@ const showStockModal = async (interaction, game, stockName) => {
 
 	const nameType = new TextInputComponent()
 		.setCustomId('nameType')
-		.setLabel('주식이름/종류')
+		.setLabel('주식이름/종류 (업데이트는 이름과 종류를 바꿀 수 없음)')
 		.setStyle('SHORT');
 
 	const value = new TextInputComponent()
@@ -112,71 +112,88 @@ const chkStockOptions = param => {
  * @param {boolean} isNew
  */
 const updateStock = async (interaction, game, isNew) => {
-	const [name, type] = interaction.fields.getTextInputValue('nameType').split('/');
-	const value = Number(interaction.fields.getTextInputValue('value'));
-	const [minRatio, maxRatio, dividend, correctionCnt] = interaction.fields
-		.getTextInputValue('ratio')
-		.split('/');
-	const conditionList = interaction.fields
-		.getTextInputValue('conditionList')
-		.split('/')
-		.map(Number);
-	const comment = interaction.fields.getTextInputValue('comment');
+	try {
+		const [name, type] = interaction.fields.getTextInputValue('nameType').split('/');
+		const value = Number(interaction.fields.getTextInputValue('value'));
+		const [minRatio, maxRatio, dividend, correctionCnt] = interaction.fields
+			.getTextInputValue('ratio')
+			.split('/');
+		const conditionList = interaction.fields
+			.getTextInputValue('conditionList')
+			.split('/')
+			.map(Number);
+		const comment = interaction.fields.getTextInputValue('comment');
 
-	const param = {
-		name,
-		type,
-		value,
-		comment,
-		minRatio,
-		maxRatio,
-		correctionCnt,
-		conditionList,
-		dividend,
-	};
-	const { code, message } = chkStockOptions(param);
-	if (!code) {
+		const param = {
+			name,
+			type,
+			value,
+			comment,
+			minRatio,
+			maxRatio,
+			correctionCnt,
+			conditionList,
+			dividend,
+		};
+		const { code, message } = chkStockOptions(param);
+		if (!code) {
+			await interaction.reply({
+				content: message,
+				components: [getNewSelectMenu()],
+				ephemeral: true,
+			});
+			return;
+		}
+		/** DB Info */
+		let content = '';
+		const classParam = {
+			ratio: { min: param.minRatio, max: param.maxRatio },
+			...param,
+			updateTime: secretKey.stockUpdateTime,
+		};
+		if (isNew) {
+			const stock = type === 'stock' ? new Stock(classParam) : new Coin(classParam);
+			const gambleResult = game.gamble.addStock(stock);
+			if (!gambleResult.code) {
+				await interaction.reply({
+					content: gambleResult.message,
+					components: [getNewSelectMenu()],
+					ephemeral: true,
+				});
+				return;
+			}
+			const dbResult = await StockModel.addStock(param);
+			content = dbResult.code ? '주식추가 완료' : dbResult.message;
+		} else {
+			const stock = game.gamble.getStock(type, name);
+			if (!stock) {
+				await interaction.reply({
+					content: `해당하는 이름의 ${type === 'stock' ? '주식' : '코인'}이 없습니다.`,
+					components: [getNewSelectMenu()],
+					ephemeral: true,
+				});
+				return;
+			}
+			stock.comment = param.comment;
+			stock.conditionList = param.conditionList;
+			stock.value = param.value;
+			stock.dividend = param.dividend;
+			stock.setRatio({ min: param.minRatio, max: param.maxRatio });
+			stock.correctionCnt = param.correctionCnt;
+
+			const dbResult = await StockModel.updateStock(param);
+			content = dbResult.code ? '주식 업데이트 완료' : dbResult.message;
+		}
+
 		await interaction.reply({
-			content: message,
+			content,
 			components: [getNewSelectMenu()],
 			ephemeral: true,
 		});
-		return;
+	} catch (err) {
+		logger.error(err);
+		await interaction.reply({ content: `${err}`, ephemeral: true });
 	}
-	/** DB Info */
-	const content = '';
-	const classParam = {
-		ratio: { min: param.minRatio, max: param.maxRatio },
-		...param,
-		updateTime: secretKey.stockUpdateTime,
-	};
-	if (isNew) {
-		const stock = type === 'stock' ? new Stock(classParam) : new Coin(classParam);
-		const gambleResult = game.gamble.addStock(stock);
-		if (!gambleResult.code) {
-			await interaction.reply({
-				content: gambleResult.message,
-				components: [getNewSelectMenu()],
-				ephemeral: true,
-			});
-			return;
-		}
-		const dbResult = await StockModel.addStock(param);
-		if (!dbResult.code) {
-			await interaction.reply({
-				content: dbResult.message,
-				components: [getNewSelectMenu()],
-				ephemeral: true,
-			});
-			return;
-		}
-	}
-
-	await interaction.reply({
-		content,
-		components: [getNewSelectMenu()],
-		ephemeral: true,
-	});
 };
 
 module.exports = {
@@ -231,10 +248,13 @@ module.exports = {
 				description: stock.type,
 			}));
 			switch (command[0]) {
-				case 'showAddStockModal':
+				case 'showAddStockModal': // 주식종류 추가하는 모달창 띄우기
 					await showStockModal(interaction);
 					break;
-				case 'selectStock':
+				case 'updateStock': // 주식 업데이트
+					await showStockModal(interaction, game, command[1]);
+					break;
+				case 'selectStock': // 주식 업데이트에서 누른 주식
 					await interaction.reply({
 						content: 'Admin Options',
 						components: [
@@ -247,9 +267,6 @@ module.exports = {
 						],
 						ephemeral: true,
 					});
-					break;
-				case 'updateStock':
-					await showStockModal(interaction, game, command[1]);
 					break;
 				default:
 					break;

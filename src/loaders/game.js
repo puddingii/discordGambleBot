@@ -6,7 +6,7 @@ const Coin = require('../controller/Gamble/Coin');
 const Weapon = require('../controller/Weapon/Weapon');
 const Sword = require('../controller/Weapon/Sword');
 const {
-	cradle: { UserModel, StockModel },
+	cradle: { UserModel, StockModel, secretKey },
 } = require('../config/dependencyInjection');
 
 module.exports = async () => {
@@ -71,8 +71,8 @@ module.exports = async () => {
 		}
 		game.gamble.curTime++;
 		const { stockList, userList } = game.gamble.update();
-		stockList.length && StockModel.updateStock(stockList);
+		stockList.length && StockModel.updateStockList(stockList);
 		userList.length && UserModel.updateMoney(userList);
-	}, 1000 * 60 * 30); // 맨 뒤의 값이 분단위임
+	}, 1000 * secretKey.gambleUpdateTime); // 맨 뒤의 값이 분단위임
 	return game;
 };

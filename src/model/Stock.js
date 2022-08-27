@@ -115,11 +115,11 @@ Stock.statics.findByName = async function (name) {
 };
 
 /**
- * 주식정보 리스트째로 업데이트
+ * 주식정보 리스트째로 업데이트(주식 히스토리 추가 전용)
  * @this import('mongoose').Model
  * @param {Coin[] | Stock[]} updateList
  */
-Stock.statics.updateStock = async function (updateList) {
+Stock.statics.updateStockList = async function (updateList) {
 	const updPromiseList = updateList.map(async updStock => {
 		const stock = await this.findOne({ name: updStock.name });
 		stock.value = updStock.value;
@@ -137,6 +137,26 @@ Stock.statics.updateStock = async function (updateList) {
 			logger.error(`${result.reason}`);
 		}
 	});
+};
+
+/**
+ * 주식정보 업데이트 (히스토리 추가하지 않음. 어드민 전용)
+ * @this import('mongoose').Model
+ * @param {Coin | Stock} updatedStockInfo
+ */
+Stock.statics.updateStock = async function (updatedStockInfo) {
+	const stock = await this.findOne({ name: updatedStockInfo.name });
+	if (!stock) {
+		return { code: 0, message: '해당하는 주식이 없습니다.' };
+	}
+	Object.keys(updatedStockInfo).forEach(key => {
+		if (key === 'name' || key === 'type') {
+			return;
+		}
+		stock[key] = updatedStockInfo[key];
+	});
+	await stock.update();
+	return { code: 1 };
 };
 
 // 아래는 참고용 소스
