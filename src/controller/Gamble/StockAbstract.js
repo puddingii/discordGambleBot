@@ -49,6 +49,8 @@ module.exports = class StockAbstract {
 		this.removeAllCorrectionHistory();
 		return ratio;
 	}
+	/** @abstract */
+	checkStockValidation() {}
 	/** ratio에서 참고하여 min <= x <= max 범위의 랜덤 x값을 산출한다. */
 	getRandomRatio() {
 		const curRatio = this.getRatio();
