@@ -1,9 +1,9 @@
 const { MessageActionRow, Modal, TextInputComponent } = require('discord.js');
 const {
 	cradle: { StockModel, logger, secretKey },
-} = require('../config/dependencyInjection');
-const Stock = require('../controller/Gamble/Stock');
-const Coin = require('../controller/Gamble/Coin');
+} = require('../../config/dependencyInjection');
+const Stock = require('../../controller/Gamble/Stock');
+const Coin = require('../../controller/Gamble/Coin');
 
 module.exports = {
 	/** selectbox interaction function */
