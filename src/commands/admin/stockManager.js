@@ -2,6 +2,7 @@ const { MessageActionRow, Modal, TextInputComponent } = require('discord.js');
 const {
 	cradle: { StockModel, logger, secretKey },
 } = require('../../config/dependencyInjection');
+const { getNewSelectMenu } = require('./common');
 const Stock = require('../../controller/Gamble/Stock');
 const Coin = require('../../controller/Gamble/Coin');
 

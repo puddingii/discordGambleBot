@@ -7,26 +7,7 @@ const {
 	modalSubmit: { updateStock },
 	select: { showStockModal },
 } = require('./admin/stockManager');
-
-const getNewSelectMenu = () => {
-	return new MessageActionRow().addComponents(
-		new MessageSelectMenu()
-			.setCustomId('어드민-main')
-			.setPlaceholder('Nothing selected')
-			.addOptions([
-				{
-					label: '주식추가',
-					description: '주식추가',
-					value: 'showAddStockModal',
-				},
-				{
-					label: '주식정보업데이트',
-					description: '주식정보 강제 업데이트',
-					value: 'selectStock',
-				},
-			]),
-	);
-};
+const { getNewSelectMenu } = require('./admin/common');
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -99,6 +80,8 @@ module.exports = {
 						],
 						ephemeral: true,
 					});
+					break;
+				case 'giveMoney':
 					break;
 				default:
 					break;
