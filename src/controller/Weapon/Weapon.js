@@ -47,7 +47,7 @@ module.exports = class Weapon {
 	 * @returns {DefaultResult & { myWeapon: Sword, money: number }}
 	 */
 	enhanceWeapon(userId, type, isPreventDestroy = false, isPreventDown = false) {
-		const userInfo = Game.getUser(userId);
+		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}

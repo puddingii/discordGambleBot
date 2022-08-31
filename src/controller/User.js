@@ -56,7 +56,7 @@ module.exports = class User {
 
 	/**
 	 * @param {Number} money
-	 * @param {'stock' | 'coin' | 'weapon'} type
+	 * @param {'stock' | 'coin' | 'weapon' | undefined} type
 	 * @return {DefaultResult}
 	 */
 	updateMoney(money, type) {

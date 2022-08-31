@@ -14,10 +14,13 @@ module.exports = class Game {
 
 	/**
 	 * 디스코드 아이디를 가지고 유저클래스 찾기
-	 * @param {string} discordId
+	 * @param {{ discordId?: string, nickname?: string }} userInfo
 	 */
-	static getUser(discordId) {
-		return this.userList.find(userInfo => userInfo.getId() === discordId);
+	static getUser({ discordId, nickname }) {
+		if (discordId) {
+			return this.userList.find(userInfo => userInfo.getId() === discordId);
+		}
+		return this.userList.find(userInfo => userInfo.nickname === nickname);
 	}
 
 	/**
@@ -43,7 +46,7 @@ module.exports = class Game {
 	 * @return {DefaultResult}
 	 */
 	addUser(myInfo) {
-		const isExistUser = this.getUser(myInfo.id);
+		const isExistUser = this.getUser({ discordId: myInfo.id });
 		if (isExistUser) {
 			return { code: 0, message: '이미 있는 유저입니다.' };
 		}
@@ -53,11 +56,14 @@ module.exports = class Game {
 	}
 
 	/**
-	 * 디스코드 아이디를 가지고 유저클래스 찾기
-	 * @param {string} discordId
+	 * 유저클래스 찾기
+	 * @param {{ discordId?: string, nickname?: string }} userInfo
 	 */
-	getUser(discordId) {
-		return Game.userList.find(userInfo => userInfo.getId() === discordId);
+	getUser({ discordId, nickname }) {
+		if (discordId) {
+			return Game.userList.find(userInfo => userInfo.getId() === discordId);
+		}
+		return Game.userList.find(userInfo => userInfo.nickname === nickname);
 	}
 
 	getUserList() {

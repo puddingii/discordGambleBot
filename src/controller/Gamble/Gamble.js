@@ -48,7 +48,7 @@ module.exports = class Gamble {
 	 * @returns {DefaultResult & { cnt?: number, value?: number, money?: number }}
 	 */
 	buySellStock(userId, stockName, cnt, isFull) {
-		const userInfo = Game.getUser(userId);
+		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}
@@ -84,7 +84,7 @@ module.exports = class Gamble {
 	 * @return {{ stockList: {name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number}[], totalMyValue: number, totalStockValue: number}}
 	 */
 	getMyStock(myDiscordId) {
-		const user = Game.getUser(myDiscordId);
+		const user = Game.getUser({ discordId: myDiscordId });
 		if (!user) {
 			return { code: 1, message: '유저정보를 찾을 수 없습니다.' };
 		}
@@ -189,7 +189,7 @@ module.exports = class Gamble {
 	 * @returns {DefaultResult & { userInfo?: Stock }}
 	 */
 	updateMoney(userId, value) {
-		const userInfo = Game.getUser(userId);
+		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}
