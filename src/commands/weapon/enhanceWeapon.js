@@ -25,7 +25,7 @@ module.exports = {
 			const isPreventFail = interaction.options.getBoolean('하락방지') ?? false;
 			const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
-			const beforePower = game.getUser(discordId).getWeapon('sword')?.curPower ?? 0;
+			const beforePower = game.getUser({ discordId }).getWeapon('sword')?.curPower ?? 0;
 			const ratioInfo = game.weapon.swordInfo.ratioList[beforePower];
 			const successRatio = (1 - (ratioInfo.destroyRatio + ratioInfo.failRatio)) * 100;
 			const { code, message, myWeapon, money } = game.weapon.enhanceWeapon(

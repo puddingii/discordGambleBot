@@ -16,7 +16,7 @@ module.exports = {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			const myWeapon = game.getUser(discordId).getWeapon('sword');
+			const myWeapon = game.getUser({ discordId }).getWeapon('sword');
 			if (!myWeapon) {
 				await interaction.reply({ content: '내역 없음' });
 				return;
