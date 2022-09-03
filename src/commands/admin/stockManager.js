@@ -1,8 +1,7 @@
-const { MessageActionRow, Modal, TextInputComponent } = require('discord.js');
 const {
 	cradle: { StockModel, logger, secretKey },
 } = require('../../config/dependencyInjection');
-const { getNewSelectMenu } = require('./common');
+const { getNewSelectMenu, getModal } = require('./common');
 const Stock = require('../../controller/Gamble/Stock');
 const Coin = require('../../controller/Gamble/Coin');
 
@@ -15,50 +14,32 @@ module.exports = {
 		 * @param {string} stockName
 		 */
 		async showStockModal(interaction, game, stockName) {
-			const modal = new Modal()
-				.setCustomId(`어드민-${stockName ? 'updateStock' : 'addStock'}`)
-				.setTitle('주식 추가/업데이트');
-
-			const nameType = new TextInputComponent()
-				.setCustomId('nameType')
-				.setLabel('주식이름/종류 (업데이트는 이름과 종류를 바꿀 수 없음)')
-				.setStyle('SHORT');
-
-			const value = new TextInputComponent()
-				.setCustomId('value')
-				.setLabel('1주당 가격')
-				.setStyle('SHORT');
-
-			const ratio = new TextInputComponent()
-				.setCustomId('ratio')
-				.setLabel('최소/최대/배당퍼센트/조정주기(n*30분)')
-				.setStyle('SHORT');
-
-			const conditionList = new TextInputComponent()
-				.setCustomId('conditionList')
-				.setLabel('컨디션 - 아무일도없음/씹악재/악재/호재/씹호재')
-				.setStyle('SHORT');
-
-			const comment = new TextInputComponent()
-				.setCustomId('comment')
-				.setLabel('설명')
-				.setStyle('PARAGRAPH');
+			const modalInfo = {
+				id: `어드민-${stockName ? 'updateStock' : 'addStock'}`,
+				title: '주식 추가/업데이트',
+			};
+			const inputBoxInfo = {
+				nameType: { label: '주식이름/종류 (업데이트는 이름과 종류를 바꿀 수 없음)' },
+				value: { label: '1주당 가격' },
+				ratio: { label: '최소/최대/배당퍼센트/조정주기(n*30분)' },
+				conditionList: { label: '컨디션 - 아무일도없음/씹악재/악재/호재/씹호재' },
+				comment: { label: '설명', style: 'PARAGRAPH' },
+			};
 
 			if (stockName) {
 				const stock = game.gamble.getStock('', stockName);
-				nameType.setValue(`${stock.name}/${stock.type}`);
-				value.setValue(`${stock.value}`);
+				inputBoxInfo.nameType.value = `${stock.name}/${stock.type}`;
+				inputBoxInfo.value.value = `${stock.value}`;
 				const { min, max } = stock.getRatio();
-				ratio.setValue(`${min}/${max}/${stock.dividend}/${stock.correctionCnt}`);
-				conditionList.setValue(`${stock?.conditionList.join('/')}`);
-				comment.setValue(`${stock.comment}`);
+				inputBoxInfo.ratio.value = `${min}/${max}/${stock.dividend}/${stock.correctionCnt}`;
+				inputBoxInfo.conditionList.value = `${stock?.conditionList.join('/')}`;
+				inputBoxInfo.comment.value = `${stock.comment}`;
 			}
 
-			const actionRows = [nameType, value, ratio, conditionList, comment].map(row =>
-				new MessageActionRow().addComponents(row),
+			const modal = getModal(
+				modalInfo,
+				Object.keys(inputBoxInfo).map(key => ({ id: key, ...inputBoxInfo[key] })),
 			);
-
-			modal.addComponents(...actionRows);
 			await interaction.showModal(modal);
 		},
 	},

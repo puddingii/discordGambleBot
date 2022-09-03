@@ -1,4 +1,9 @@
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const {
+	MessageActionRow,
+	MessageSelectMenu,
+	Modal,
+	TextInputComponent,
+} = require('discord.js');
 
 module.exports = {
 	getNewSelectMenu() {
@@ -24,5 +29,25 @@ module.exports = {
 					},
 				]),
 		);
+	},
+	/**
+	 * @param {{ id: string, title: string }} modalInfo
+	 * @param {{ id: string, label: string, style?: 'SHORT' | 'PARAGRAPH', value?: '' }[]} inputBoxList
+	 */
+	getModal(modalInfo, inputBoxList) {
+		const modal = new Modal().setCustomId(modalInfo.id).setTitle(modalInfo.title);
+
+		const actionRows = inputBoxList.map(inputBox => {
+			return new MessageActionRow().addComponents(
+				new TextInputComponent()
+					.setCustomId(inputBox.id)
+					.setLabel(inputBox.label)
+					.setStyle(inputBox.style ?? 'SHORT')
+					.setValue(inputBox.value ?? ''),
+			);
+		});
+
+		modal.addComponents(...actionRows);
+		return modal;
 	},
 };
