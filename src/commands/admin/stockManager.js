@@ -1,5 +1,5 @@
 const {
-	cradle: { StockModel, logger, secretKey },
+	cradle: { StockModel, secretKey },
 } = require('../../config/dependencyInjection');
 const { getNewSelectMenu, getModal } = require('./common');
 const Stock = require('../../controller/Gamble/Stock');
@@ -36,10 +36,7 @@ module.exports = {
 				inputBoxInfo.comment.value = `${stock.comment}`;
 			}
 
-			const modal = getModal(
-				modalInfo,
-				Object.keys(inputBoxInfo).map(key => ({ id: key, ...inputBoxInfo[key] })),
-			);
+			const modal = getModal(modalInfo, inputBoxInfo);
 			await interaction.showModal(modal);
 		},
 	},
@@ -52,95 +49,88 @@ module.exports = {
 		 * @param {boolean} isNew
 		 */
 		async updateStock(interaction, game, isNew) {
-			try {
-				const [name, type] = interaction.fields.getTextInputValue('nameType').split('/');
-				const value = Number(interaction.fields.getTextInputValue('value'));
-				const [minRatio, maxRatio, dividend, correctionCnt] = interaction.fields
-					.getTextInputValue('ratio')
-					.split('/')
-					.map(Number);
-				const conditionList = interaction.fields
-					.getTextInputValue('conditionList')
-					.split('/')
-					.map(Number);
-				const comment = interaction.fields.getTextInputValue('comment');
+			const [name, type] = interaction.fields.getTextInputValue('nameType').split('/');
+			const value = Number(interaction.fields.getTextInputValue('value'));
+			const [minRatio, maxRatio, dividend, correctionCnt] = interaction.fields
+				.getTextInputValue('ratio')
+				.split('/')
+				.map(Number);
+			const conditionList = interaction.fields
+				.getTextInputValue('conditionList')
+				.split('/')
+				.map(Number);
+			const comment = interaction.fields.getTextInputValue('comment');
 
-				const param = {
-					name,
-					type,
-					value,
-					comment,
-					minRatio,
-					maxRatio,
-					correctionCnt,
-					conditionList,
-					dividend,
-				};
+			const param = {
+				name,
+				type,
+				value,
+				comment,
+				minRatio,
+				maxRatio,
+				correctionCnt,
+				conditionList,
+				dividend,
+			};
 
-				const { code, message } =
-					type === 'stock'
-						? Stock.checkStockValidation(param)
-						: Coin.checkStockValidation(param);
-				if (!code) {
+			const { code, message } =
+				type === 'stock'
+					? Stock.checkStockValidation(param)
+					: Coin.checkStockValidation(param);
+			if (!code) {
+				await interaction.reply({
+					content: message,
+					components: [getNewSelectMenu()],
+					ephemeral: true,
+				});
+				return;
+			}
+			/** DB Info */
+			let content = '';
+			const classParam = {
+				ratio: { min: param.minRatio, max: param.maxRatio },
+				...param,
+				updateTime: secretKey.stockUpdateTime,
+			};
+			if (isNew) {
+				const stock = type === 'stock' ? new Stock(classParam) : new Coin(classParam);
+				const gambleResult = game.gamble.addStock(stock);
+				if (!gambleResult.code) {
 					await interaction.reply({
-						content: message,
+						content: gambleResult.message,
 						components: [getNewSelectMenu()],
 						ephemeral: true,
 					});
 					return;
 				}
-				/** DB Info */
-				let content = '';
-				const classParam = {
-					ratio: { min: param.minRatio, max: param.maxRatio },
-					...param,
-					updateTime: secretKey.stockUpdateTime,
-				};
-				if (isNew) {
-					const stock = type === 'stock' ? new Stock(classParam) : new Coin(classParam);
-					const gambleResult = game.gamble.addStock(stock);
-					if (!gambleResult.code) {
-						await interaction.reply({
-							content: gambleResult.message,
-							components: [getNewSelectMenu()],
-							ephemeral: true,
-						});
-						return;
-					}
-					const dbResult = await StockModel.addStock(param);
-					content = dbResult.code ? '주식추가 완료' : dbResult.message;
-				} else {
-					const stock = game.gamble.getStock(type, name);
-					if (!stock) {
-						await interaction.reply({
-							content: `해당하는 이름의 ${
-								type === 'stock' ? '주식' : '코인'
-							}이 없습니다.`,
-							components: [getNewSelectMenu()],
-							ephemeral: true,
-						});
-						return;
-					}
-					stock.comment = param.comment;
-					stock.conditionList = param.conditionList;
-					stock.value = param.value;
-					stock.dividend = param.dividend;
-					stock.setRatio({ min: param.minRatio, max: param.maxRatio });
-					stock.correctionCnt = param.correctionCnt;
-
-					const dbResult = await StockModel.updateStock(param);
-					content = dbResult.code ? '주식 업데이트 완료' : dbResult.message;
+				const dbResult = await StockModel.addStock(param);
+				content = dbResult.code ? '주식추가 완료' : dbResult.message;
+			} else {
+				const stock = game.gamble.getStock(type, name);
+				if (!stock) {
+					await interaction.reply({
+						content: `해당하는 이름의 ${type === 'stock' ? '주식' : '코인'}이 없습니다.`,
+						components: [getNewSelectMenu()],
+						ephemeral: true,
+					});
+					return;
 				}
+				stock.comment = param.comment;
+				stock.conditionList = param.conditionList;
+				stock.value = param.value;
+				stock.dividend = param.dividend;
+				stock.setRatio({ min: param.minRatio, max: param.maxRatio });
+				stock.correctionCnt = param.correctionCnt;
 
-				await interaction.reply({
-					content,
-					components: [getNewSelectMenu()],
-					ephemeral: true,
-				});
-			} catch (err) {
-				logger.error(err);
-				await interaction.reply({ content: `${err}`, ephemeral: true });
+				const dbResult = await StockModel.updateStock(param);
+				content = dbResult.code ? '주식 업데이트 완료' : dbResult.message;
 			}
+
+			await interaction.reply({
+				content,
+				components: [getNewSelectMenu()],
+				ephemeral: true,
+			});
 		},
 	},
 };

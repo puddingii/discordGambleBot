@@ -31,10 +31,16 @@ module.exports = {
 		);
 	},
 	/**
+	 * 모달객체 생성
 	 * @param {{ id: string, title: string }} modalInfo
-	 * @param {{ id: string, label: string, style?: 'SHORT' | 'PARAGRAPH', value?: '' }[]} inputBoxList
+	 * @param {{[id: string]: { id: string, label: string, style?: 'SHORT' | 'PARAGRAPH', value?: '' }}} inputBoxInfo key값은 customId로 지정된다.
 	 */
-	getModal(modalInfo, inputBoxList) {
+	getModal(modalInfo, inputBoxInfo) {
+		const inputBoxList = Object.keys(inputBoxInfo).map(key => ({
+			id: key,
+			...inputBoxInfo[key],
+		}));
+
 		const modal = new Modal().setCustomId(modalInfo.id).setTitle(modalInfo.title);
 
 		const actionRows = inputBoxList.map(inputBox => {
