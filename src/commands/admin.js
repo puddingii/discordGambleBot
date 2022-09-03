@@ -7,6 +7,10 @@ const {
 	modalSubmit: { updateStock },
 	select: { showStockModal },
 } = require('./admin/stockManager');
+const {
+	modalSubmit: { giveMoney },
+	select: { showGiveMoneyModal },
+} = require('./admin/userManager');
 const { getNewSelectMenu } = require('./admin/common');
 
 module.exports = {
@@ -82,6 +86,7 @@ module.exports = {
 					});
 					break;
 				case 'giveMoney':
+					await showGiveMoneyModal(interaction);
 					break;
 				default:
 					break;
@@ -104,6 +109,9 @@ module.exports = {
 					break;
 				case 'updateStock':
 					await updateStock(interaction, game);
+					break;
+				case 'giveMoney':
+					await giveMoney(interaction, game);
 					break;
 				default:
 			}
