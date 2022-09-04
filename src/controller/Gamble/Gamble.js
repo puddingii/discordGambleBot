@@ -7,22 +7,35 @@ const Game = require('../Game');
  * @typedef {import('./Stock')} Stock
  * @typedef {import('../User')} User
  * @typedef {{ code: number, message?: string }} DefaultResult
+ * @typedef {object} GambleInitInfo
+ * @property {Coin[]} coinList
+ * @property {Stock[]} stockList
+ * @property {number} curCondition
+ * @property {number} curTime
+ * @property {number} conditionPeriod
+ * @property {number[]} conditionRatioPerList
  */
 
 module.exports = class Gamble {
 	/**
-	 * @param {Coin[]} coinList
-	 * @param {Stock[]} stockList
+	 * @param {GambleInitInfo}
 	 */
-	constructor(coinList, stockList) {
+	constructor({
+		coinList,
+		stockList,
+		curCondition,
+		curTime,
+		conditionPeriod,
+		conditionRatioPerList,
+	}) {
 		/** @type {Array<Coin>} */
 		this.coinList = coinList ?? [];
 		/** @type {Array<Stock>} */
 		this.stockList = stockList ?? [];
-		this.conditionRatioPerList = [4, 16, 16, 4];
-		this.curCondition = 0;
-		this.curTime = 0;
-		this.conditionPeriod = 24;
+		this.conditionRatioPerList = conditionRatioPerList ?? [4, 16, 16, 4];
+		this.curCondition = curCondition ?? 0;
+		this.curTime = curTime ?? 0;
+		this.conditionPeriod = conditionPeriod ?? 24;
 	}
 
 	/**

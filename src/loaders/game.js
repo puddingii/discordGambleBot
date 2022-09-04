@@ -1,12 +1,12 @@
 const Gamble = require('../controller/Gamble/Gamble');
-const Game = require('../controller/Game');
-const User = require('../controller/User');
 const Stock = require('../controller/Gamble/Stock');
 const Coin = require('../controller/Gamble/Coin');
+const Game = require('../controller/Game');
+const User = require('../controller/User');
 const Weapon = require('../controller/Weapon/Weapon');
 const Sword = require('../controller/Weapon/Sword');
 const {
-	cradle: { UserModel, StockModel, secretKey },
+	cradle: { UserModel, StockModel, StatusModel, secretKey },
 } = require('../config/dependencyInjection');
 
 module.exports = async () => {
@@ -61,18 +61,34 @@ module.exports = async () => {
 		});
 	});
 
+	const {
+		user: { grantMoney },
+		gamble: { curTime, curCondition, conditionPeriod, conditionRatioPerList },
+	} = await StatusModel.getStatus();
+
 	const weapon = new Weapon();
-	const gamble = new Gamble(coinList, stockList);
-	const game = new Game(userList, gamble, weapon);
+	const gamble = new Gamble({
+		coinList,
+		stockList,
+		conditionPeriod,
+		curTime,
+		curCondition,
+		conditionRatioPerList,
+	});
+	const game = new Game({ userList, gamble, weapon, grantMoney });
 	setInterval(() => {
 		/** 12시간마다 컨디션 조정 */
 		if (game.gamble.curTime % game.gamble.conditionPeriod === 0) {
 			game.gamble.updateCondition();
 		}
 		game.gamble.curTime++;
+		game.updateGrantMoney();
 		const { stockList, userList } = game.gamble.update();
 		stockList.length && StockModel.updateStockList(stockList);
 		userList.length && UserModel.updateMoney(userList);
+		if (game.gamble.curTime % 4 === 0) {
+			StatusModel.updateStatus(game);
+		}
 	}, 1000 * secretKey.gambleUpdateTime); // 맨 뒤의 값이 분단위임
 	return game;
 };

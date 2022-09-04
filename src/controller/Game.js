@@ -4,7 +4,14 @@ const User = require('./User');
  * @typedef {import('./Gamble/Coin')} Coin
  * @typedef {import('./Gamble/Stock')} Stock
  * @typedef {import('./User')} User
+ * @typedef {import('./Gamble/Gamble')} Gamble
+ * @typedef {import('./Weapon/Weapon')} Weapon
  * @typedef {{ code: number, message?: string }} DefaultResult
+ * @typedef {object} GameInitInfo
+ * @property {User[]} userList
+ * @property {Gamble} gamble
+ * @property {Weapon} weapon
+ * @property {number} grantMoney
  */
 
 module.exports = class Game {
@@ -25,17 +32,16 @@ module.exports = class Game {
 
 	/**
 	 * 싱글톤으로 관리
-	 * @param {import('./Gamble/Gamble')} gamble
-	 * @param {import('./User')[]} userList
-	 * @param {import('./Weapon/Weapon')} weapon
+	 * @param {GameInitInfo}
 	 */
-	constructor(userList, gamble, weapon) {
+	constructor({ userList, gamble, weapon, grantMoney }) {
 		if (Game.instance) {
 			// eslint-disable-next-line no-constructor-return
 			return Game.instance;
 		}
 		this.gamble = gamble;
 		this.weapon = weapon;
+		this.grantMoney = grantMoney ?? 0;
 		Game.userList = userList;
 		Game.instance = this;
 	}
@@ -68,5 +74,9 @@ module.exports = class Game {
 
 	getUserList() {
 		return Game.userList;
+	}
+
+	updateGrantMoney() {
+		this.grantMoney += 210 + this.grantMoney * 0.02;
 	}
 };
