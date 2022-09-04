@@ -9,6 +9,7 @@ declare namespace DIFB {
 	interface Models {
 		UserModel: typeof import('../model/User');
 		StockModel: typeof import('../model/Stock');
+		StatusModel: typeof import('../model/Status');
 	}
 
 	interface Controllers {}
