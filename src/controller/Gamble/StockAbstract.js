@@ -35,7 +35,7 @@ module.exports = class StockAbstract {
 	}
 	/** (조정주기 * 0.05) 이상의 변동률이 있을때 ((조정주기 - 1) * 0.05)만큼 -+해준다. */
 	calcCorrect() {
-		if (this.correctionHistory.length !== this.correctionCnt) {
+		if (this.correctionHistory.length < this.correctionCnt) {
 			return 0;
 		}
 		const corHistory = this.correctionHistory;

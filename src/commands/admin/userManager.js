@@ -8,8 +8,6 @@ module.exports = {
 	select: {
 		/**
 		 * @param {import('discord.js').SelectMenuInteraction} interaction
-		 * @param {import('../../controller/Game')} game
-		 * @param {number} cnt 액수
 		 */
 		async showGiveMoneyModal(interaction) {
 			const modalInfo = {

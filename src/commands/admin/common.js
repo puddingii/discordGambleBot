@@ -23,9 +23,14 @@ module.exports = {
 						value: 'selectStock',
 					},
 					{
+						label: '게임상태업데이트',
+						description: '게임상태 강제 업데이트',
+						value: 'showGameStatusModal',
+					},
+					{
 						label: '돈기부',
 						description: '돈 주는 기능',
-						value: 'giveMoney',
+						value: 'showGiveMoneyModal',
 					},
 				]),
 		);
