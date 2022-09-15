@@ -78,5 +78,8 @@ module.exports = class Game {
 
 	updateGrantMoney() {
 		this.grantMoney += 210 + this.grantMoney * 0.02;
+		if (this.grantMoney > 5_000_000) {
+			this.grantMoney = 5_000_000;
+		}
 	}
 };
