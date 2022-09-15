@@ -34,9 +34,9 @@ const Status = new mongoose.Schema({
  * @param {'game'} type
  */
 Status.statics.getStatus = async function () {
-	const status = await this.findOne({});
+	let status = await this.findOne({});
 	if (!status) {
-		await this.create({});
+		status = await this.create({});
 	}
 	return status;
 };

@@ -10,10 +10,10 @@ module.exports = {
 		.setDescription('무기를 강화함')
 		.addBooleanOption(option =>
 			option.setName('하락방지').setDescription('강화비용이 2배가 든다.'),
-		)
-		.addBooleanOption(option =>
-			option.setName('파괴방지').setDescription('강화비용이 3배가 든다'),
 		),
+	// .addBooleanOption(option =>
+	// 	option.setName('파괴방지').setDescription('강화비용이 3배가 든다'),
+	// ),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction
 	 * @param {import('../../controller/Game')} game
@@ -31,7 +31,7 @@ module.exports = {
 			const { code, message, myWeapon, money } = game.weapon.enhanceWeapon(
 				discordId,
 				'sword',
-				isPreventDestroy,
+				false,
 				isPreventFail,
 			);
 
