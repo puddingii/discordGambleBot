@@ -1,24 +1,21 @@
-const { SlashCommandBuilder } = require('discord.js');
+const { SlashCommandBuilder } = require('@discordjs/builders');
 const {
 	cradle: { logger },
 } = require('../../config/dependencyInjection');
 const { setComma } = require('../../config/util');
 
 module.exports = {
-	data: new SlashCommandBuilder().setName('내돈').setDescription('가지고 있는 돈'),
+	data: new SlashCommandBuilder()
+		.setName('보조금누적액')
+		.setDescription('보조금 누적액수'),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction
 	 * @param {import('../../controller/Game')} game
 	 */
 	async execute(interaction, game) {
 		try {
-			/** Discord Info */
-			const discordId = interaction.user.id.toString();
-
-			const userInfo = game.getUser({ discordId });
-
 			await interaction.reply({
-				content: `가지고 있는 돈: ${setComma(userInfo.money, true)}원`,
+				content: `${setComma(game.grantMoney, true)}원 누적되어 있음.`,
 			});
 		} catch (err) {
 			logger.error(err);

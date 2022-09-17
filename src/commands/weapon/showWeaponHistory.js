@@ -15,7 +15,7 @@ module.exports = {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
 
-			const myWeapon = game.getUser(discordId).getWeapon('sword');
+			const myWeapon = game.getUser({ discordId }).getWeapon('sword');
 			if (!myWeapon) {
 				await interaction.reply({ content: '내역 없음' });
 				return;
@@ -29,10 +29,10 @@ module.exports = {
 				.addFields({ name: '\u200B', value: '\u200B' })
 				.setTimestamp();
 
-			embedBox.addField(
-				'히스토리',
-				`현재 강화: ${myWeapon.curPower}강\n보너스 수치: ${myWeapon.bonusPower}\n성공: ${myWeapon.successCnt}번\n실패: ${myWeapon.failCnt}번\n파괴: ${myWeapon.destroyCnt}번`,
-			);
+			embedBox.addFields({
+				name: '히스토리',
+				value: `현재 강화: ${myWeapon.curPower}강\n보너스 수치: ${myWeapon.bonusPower}\n성공: ${myWeapon.successCnt}번\n실패: ${myWeapon.failCnt}번\n파괴: ${myWeapon.destroyCnt}번`,
+			});
 
 			await interaction.reply({ embeds: [embedBox] });
 		} catch (err) {

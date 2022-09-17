@@ -6,12 +6,12 @@ module.exports = class StockAbstract {
 
 	/**
 	 * @param {Object} stockInfo
-	 * @param {{min: number, max: number}} stockInfo.ratio
-	 * @param {string} stockInfo.name
-	 * @param {number} stockInfo.value
-	 * @param {'stock' | 'coin'} stockInfo.type
-	 * @param {number} stockInfo.updateTime
-	 * @param {number} stockInfo.correctionCnt
+	 * @param {{min: number, max: number}} stockInfo.ratio 최소최대 확률
+	 * @param {string} stockInfo.name 이름
+	 * @param {number} stockInfo.value 값
+	 * @param {'stock' | 'coin'} stockInfo.type 타입
+	 * @param {number} stockInfo.updateTime 업데이트주기
+	 * @param {number} stockInfo.correctionCnt 조정주기
 	 */
 	constructor({ ratio, name, value, type, updateTime, correctionCnt, comment }) {
 		this.#ratio = ratio;
@@ -35,7 +35,7 @@ module.exports = class StockAbstract {
 	}
 	/** (조정주기 * 0.05) 이상의 변동률이 있을때 ((조정주기 - 1) * 0.05)만큼 -+해준다. */
 	calcCorrect() {
-		if (this.correctionHistory.length !== this.correctionCnt) {
+		if (this.correctionHistory.length < this.correctionCnt) {
 			return 0;
 		}
 		const corHistory = this.correctionHistory;
@@ -49,6 +49,8 @@ module.exports = class StockAbstract {
 		this.removeAllCorrectionHistory();
 		return ratio;
 	}
+	/** @abstract */
+	checkStockValidation() {}
 	/** ratio에서 참고하여 min <= x <= max 범위의 랜덤 x값을 산출한다. */
 	getRandomRatio() {
 		const curRatio = this.getRatio();

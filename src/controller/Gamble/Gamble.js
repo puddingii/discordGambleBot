@@ -7,22 +7,35 @@ const Game = require('../Game');
  * @typedef {import('./Stock')} Stock
  * @typedef {import('../User')} User
  * @typedef {{ code: number, message?: string }} DefaultResult
+ * @typedef {object} GambleInitInfo
+ * @property {Coin[]} coinList
+ * @property {Stock[]} stockList
+ * @property {number} curCondition
+ * @property {number} curTime
+ * @property {number} conditionPeriod
+ * @property {number[]} conditionRatioPerList
  */
 
 module.exports = class Gamble {
 	/**
-	 * @param {Coin[]} coinList
-	 * @param {Stock[]} stockList
+	 * @param {GambleInitInfo}
 	 */
-	constructor(coinList, stockList) {
+	constructor({
+		coinList,
+		stockList,
+		curCondition,
+		curTime,
+		conditionPeriod,
+		conditionRatioPerList,
+	}) {
 		/** @type {Array<Coin>} */
 		this.coinList = coinList ?? [];
 		/** @type {Array<Stock>} */
 		this.stockList = stockList ?? [];
-		this.conditionRatioPerList = [4, 16, 16, 4];
-		this.curCondition = 0;
-		this.curTime = 0;
-		this.conditionPeriod = 24;
+		this.conditionRatioPerList = conditionRatioPerList ?? [4, 16, 16, 4];
+		this.curCondition = curCondition ?? 0;
+		this.curTime = curTime ?? 0;
+		this.conditionPeriod = conditionPeriod ?? 24;
 	}
 
 	/**
@@ -48,7 +61,7 @@ module.exports = class Gamble {
 	 * @returns {DefaultResult & { cnt?: number, value?: number, money?: number }}
 	 */
 	buySellStock(userId, stockName, cnt, isFull) {
-		const userInfo = Game.getUser(userId);
+		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}
@@ -84,7 +97,7 @@ module.exports = class Gamble {
 	 * @return {{ stockList: {name: string, cnt: number, myRatio: number, myValue: number, stockValue: number, stockType: 'stock' | 'coin', stockBeforeRatio: number}[], totalMyValue: number, totalStockValue: number}}
 	 */
 	getMyStock(myDiscordId) {
-		const user = Game.getUser(myDiscordId);
+		const user = Game.getUser({ discordId: myDiscordId });
 		if (!user) {
 			return { code: 1, message: '유저정보를 찾을 수 없습니다.' };
 		}
@@ -115,11 +128,16 @@ module.exports = class Gamble {
 
 	/**
 	 * 주식/코인 리스트에서 name에 해당하는 정보 가져오기
-	 * @param {'stock' | 'coin'} type
+	 * @param {'stock' | 'coin' | ''} type
 	 * @param {string} name
 	 * @returns {Stock | Coin | undefined}
 	 */
 	getStock(type, name) {
+		if (!type) {
+			return this.stockList.concat(this.coinList).find(stock => {
+				return stock.name === name;
+			});
+		}
 		return this[`${type}List`].find(stock => {
 			return stock.name === name;
 		});
@@ -184,7 +202,7 @@ module.exports = class Gamble {
 	 * @returns {DefaultResult & { userInfo?: Stock }}
 	 */
 	updateMoney(userId, value) {
-		const userInfo = Game.getUser(userId);
+		const userInfo = Game.getUser({ discordId: userId });
 		if (!userInfo) {
 			return { code: 0, message: '유저정보가 없습니다' };
 		}

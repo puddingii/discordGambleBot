@@ -10,10 +10,10 @@ module.exports = {
 		.setDescription('무기를 강화함')
 		.addBooleanOption(option =>
 			option.setName('하락방지').setDescription('강화비용이 2배가 든다.'),
-		)
-		.addBooleanOption(option =>
-			option.setName('파괴방지').setDescription('강화비용이 3배가 든다'),
 		),
+	// .addBooleanOption(option =>
+	// 	option.setName('파괴방지').setDescription('강화비용이 3배가 든다'),
+	// ),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction
 	 * @param {import('../../controller/Game')} game
@@ -25,13 +25,13 @@ module.exports = {
 			const isPreventFail = interaction.options.getBoolean('하락방지') ?? false;
 			const isPreventDestroy = interaction.options.getBoolean('파괴방지') ?? false;
 
-			const beforePower = game.getUser(discordId).getWeapon('sword')?.curPower ?? 0;
+			const beforePower = game.getUser({ discordId }).getWeapon('sword')?.curPower ?? 0;
 			const ratioInfo = game.weapon.swordInfo.ratioList[beforePower];
 			const successRatio = (1 - (ratioInfo.destroyRatio + ratioInfo.failRatio)) * 100;
 			const { code, message, myWeapon, money } = game.weapon.enhanceWeapon(
 				discordId,
 				'sword',
-				isPreventDestroy,
+				false,
 				isPreventFail,
 			);
 
