@@ -1,5 +1,8 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageActionRow, MessageSelectMenu } = require('discord.js');
+const {
+	ActionRowBuilder,
+	SelectMenuBuilder,
+	SlashCommandBuilder,
+} = require('discord.js');
 const {
 	cradle: { logger, secretKey },
 } = require('../config/dependencyInjection');
@@ -79,8 +82,8 @@ module.exports = {
 					await interaction.reply({
 						content: '어드민전용-업데이트할 주식',
 						components: [
-							new MessageActionRow().addComponents(
-								new MessageSelectMenu()
+							new ActionRowBuilder().addComponents(
+								new SelectMenuBuilder()
 									.setCustomId('어드민')
 									.setPlaceholder('주식 리스트')
 									.addOptions(stockList),

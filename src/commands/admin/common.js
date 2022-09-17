@@ -1,14 +1,15 @@
 const {
-	MessageActionRow,
-	MessageSelectMenu,
-	Modal,
-	TextInputComponent,
+	ActionRowBuilder,
+	SelectMenuBuilder,
+	ModalBuilder,
+	TextInputBuilder,
+	TextInputStyle,
 } = require('discord.js');
 
 module.exports = {
 	getNewSelectMenu() {
-		return new MessageActionRow().addComponents(
-			new MessageSelectMenu()
+		return new ActionRowBuilder().addComponents(
+			new SelectMenuBuilder()
 				.setCustomId('어드민-main')
 				.setPlaceholder('Nothing selected')
 				.addOptions([
@@ -46,14 +47,18 @@ module.exports = {
 			...inputBoxInfo[key],
 		}));
 
-		const modal = new Modal().setCustomId(modalInfo.id).setTitle(modalInfo.title);
+		const modal = new ModalBuilder().setCustomId(modalInfo.id).setTitle(modalInfo.title);
 
 		const actionRows = inputBoxList.map(inputBox => {
-			return new MessageActionRow().addComponents(
-				new TextInputComponent()
+			return new ActionRowBuilder().addComponents(
+				new TextInputBuilder()
 					.setCustomId(inputBox.id)
 					.setLabel(inputBox.label)
-					.setStyle(inputBox.style ?? 'SHORT')
+					.setStyle(
+						inputBox.style === 'PARAGRAPH'
+							? TextInputStyle.Paragraph
+							: TextInputStyle.Short,
+					)
 					.setValue(inputBox.value ?? ''),
 			);
 		});

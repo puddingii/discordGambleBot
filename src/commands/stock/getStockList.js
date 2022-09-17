@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const dayjs = require('dayjs');
 const {
 	cradle: { logger, util },
@@ -9,12 +9,20 @@ module.exports = {
 		.setName('주식리스트')
 		.setDescription('주식리스트임. 옵션이 없으면 기본으로 전체가 뜸.')
 		.addStringOption(option =>
-			option
-				.setName('종류')
-				.setDescription('주식인지 코인인지')
-				.addChoice('주식', 'stock')
-				.addChoice('코인', 'coin')
-				.addChoice('전체', 'all'),
+			option.setName('종류').setDescription('주식인지 코인인지').addChoices(
+				{
+					name: '주식',
+					value: 'stock',
+				},
+				{
+					name: '코인',
+					value: 'coin',
+				},
+				{
+					name: '전체',
+					value: 'all',
+				},
+			),
 		),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction
@@ -27,7 +35,7 @@ module.exports = {
 			const condition =
 				game.gamble.conditionPeriod - (game.gamble.curTime % game.gamble.conditionPeriod);
 
-			const embedBox = new MessageEmbed();
+			const embedBox = new EmbedBuilder();
 			embedBox
 				.setColor('#0099ff')
 				.setTitle('주식 리스트')

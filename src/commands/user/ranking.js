@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const {
 	cradle: { logger },
 } = require('../../config/dependencyInjection');
@@ -28,7 +28,7 @@ module.exports = {
 				};
 			});
 
-			const embedBox = new MessageEmbed();
+			const embedBox = new EmbedBuilder();
 			embedBox
 				.setColor('#0099ff')
 				.setTitle('랭킹')

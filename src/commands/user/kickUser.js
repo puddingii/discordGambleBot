@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('discord.js');
-const { ChannelType } = require('discord-api-types/v9');
+const { SlashCommandBuilder, ChannelType } = require('discord.js');
 const {
 	cradle: { UserModel, logger },
 } = require('../../config/dependencyInjection');
@@ -13,7 +12,7 @@ module.exports = {
 			option
 				.setName('채널')
 				.setDescription('무야호')
-				.addChannelType(ChannelType.GuildVoice),
+				.addChannelTypes(ChannelType.GuildVoice),
 		),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction

@@ -1,5 +1,4 @@
-const { SlashCommandBuilder } = require('@discordjs/builders');
-const { MessageEmbed } = require('discord.js');
+const { EmbedBuilder, SlashCommandBuilder } = require('discord.js');
 const _ = require('lodash');
 const {
 	cradle: { UserModel, logger },
@@ -18,7 +17,7 @@ module.exports = {
 			const discordId = interaction.user.id.toString();
 
 			const userWeapon = game.getUser({ discordId }).getWeapon('sword');
-			const embedBox = new MessageEmbed();
+			const embedBox = new EmbedBuilder();
 			embedBox
 				.setColor('#0099ff')
 				.setTitle('강화 확률표')

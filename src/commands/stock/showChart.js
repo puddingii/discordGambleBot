@@ -14,20 +14,36 @@ module.exports = {
 			option.setName('이름').setDescription('주식이름').setRequired(true),
 		)
 		.addStringOption(option =>
-			option
-				.setName('차트종류')
-				.setDescription('스틱, 라인 차트')
-				.addChoice('캔들스틱', 'stick')
-				.addChoice('라인', 'line'),
+			option.setName('차트종류').setDescription('스틱, 라인 차트').addChoices(
+				{
+					name: '캔들스틱',
+					value: 'stick',
+				},
+				{
+					name: '라인',
+					value: 'line',
+				},
+			),
 		)
 		.addNumberOption(option =>
-			option
-				.setName('시간봉')
-				.setDescription('몇시간 봉으로 할건지?')
-				.addChoice('8시간(기본값)', 8)
-				.addChoice('16시간', 16)
-				.addChoice('1일', 24)
-				.addChoice('3일', 72),
+			option.setName('시간봉').setDescription('몇시간 봉으로 할건지?').addChoices(
+				{
+					name: '8시간(기본값)',
+					value: 8,
+				},
+				{
+					name: '16시간',
+					value: 16,
+				},
+				{
+					name: '1일',
+					value: 24,
+				},
+				{
+					name: '3일',
+					value: 72,
+				},
+			),
 		),
 	/**
 	 * @param {import('discord.js').CommandInteraction} interaction

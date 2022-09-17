@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const dayjs = require('dayjs');
 const {
 	cradle: { logger },
@@ -21,7 +21,7 @@ module.exports = {
 				return;
 			}
 
-			const embedBox = new MessageEmbed();
+			const embedBox = new EmbedBuilder();
 			embedBox
 				.setColor('#0099ff')
 				.setTitle('강화 히스토리')

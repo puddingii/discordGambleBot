@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, MessageEmbed } = require('discord.js');
+const { SlashCommandBuilder, EmbedBuilder } = require('discord.js');
 const dayjs = require('dayjs');
 const _ = require('lodash');
 const {
@@ -15,7 +15,7 @@ module.exports = {
 		try {
 			/** Discord Info */
 			const discordId = interaction.user.id.toString();
-			const embedBox = new MessageEmbed();
+			const embedBox = new EmbedBuilder();
 			embedBox
 				.setColor('#0099ff')
 				.setTitle('내 주식 리스트')

@@ -42,9 +42,9 @@ module.exports = (client, game) => {
 		// eslint-disable-next-line global-require
 		const event = require(`../events/${file}`);
 		if (event.once) {
-			client.rest.once(event.name, (...args) => event.execute(...args, game));
+			client.once(event.name, (...args) => event.execute(...args, game));
 		} else {
-			client.rest.on(event.name, (...args) => event.execute(...args, game));
+			client.on(event.name, (...args) => event.execute(...args, game));
 		}
 	});
 };

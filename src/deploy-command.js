@@ -1,5 +1,5 @@
 const { REST } = require('@discordjs/rest');
-const { Routes } = require('discord-api-types/v9');
+const { Routes } = require('discord.js');
 const dotenv = require('dotenv');
 const path = require('path');
 const fs = require('fs');
@@ -42,7 +42,7 @@ dotenv.config({ path: path.resolve(__dirname, '../.env') });
 	});
 
 	/** Apply commands */
-	const rest = new REST({ version: '9' }).setToken(secretKey.botToken);
+	const rest = new REST({ version: '10' }).setToken(secretKey.botToken);
 	rest
 		.put(Routes.applicationGuildCommands(secretKey.clientId, secretKey.guildId), {
 			body: commands,

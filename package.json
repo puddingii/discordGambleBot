@@ -1,45 +1,44 @@
 {
-	"name": "selfmanagebot",
-	"version": "1.0.0",
-	"main": "app.js",
-	"scripts": {
-		"start": "cross-env NODE_ENV=production node src/deploy-command.js && node src/app.js",
-		"start:commandBuild": "cross-env NODE_ENV=production node src/deploy-command.js",
-		"build": "babel src -d build",
-		"dev:app": "cross-env NODE_ENV=development node src/deploy-command.js && cross-env NODE_ENV=development node src/app.js",
-		"dev:deploy": "cross-env NODE_ENV=development node src/deploy-command.js",
-		"dev:server": "cross-env NODE_ENV=development node src/app.js",
-		"dev:classTest": "node src/controller/Game.js"
-	},
-	"author": "",
-	"license": "ISC",
-	"description": "",
-	"dependencies": {
-		"@discordjs/rest": "^0.3.0",
-		"awilix": "^6.1.0",
-		"dayjs": "^1.10.8",
-		"discord-api-types": "^0.27.3",
-		"discord.js": "14.3.0",
-		"dotenv": "^16.0.0",
-		"echarts": "^5.3.3",
-		"lodash": "^4.17.21",
-		"mongoose": "^6.2.4",
-		"sharp": "^0.30.7",
-		"winston": "^3.6.0",
-		"winston-daily-rotate-file": "^4.6.1"
-	},
-	"devDependencies": {
-		"@babel/cli": "^7.17.6",
-		"@babel/core": "^7.17.8",
-		"@babel/preset-env": "^7.16.11",
-		"cross-env": "^7.0.3",
-		"eslint": "^8.10.0",
-		"eslint-config-airbnb-base": "^15.0.0",
-		"eslint-config-prettier": "^8.5.0",
-		"eslint-plugin-import": "^2.26.0",
-		"eslint-plugin-prettier": "^4.0.0",
-		"eslint-plugin-sort-class-members": "^1.14.1",
-		"nodemon": "^2.0.15",
-		"prettier": "^2.5.1"
-	}
+  "name": "selfmanagebot",
+  "version": "1.0.0",
+  "main": "app.js",
+  "scripts": {
+    "start": "cross-env NODE_ENV=production node src/deploy-command.js && node src/app.js",
+    "start:commandBuild": "cross-env NODE_ENV=production node src/deploy-command.js",
+    "build": "babel src -d build",
+    "dev:app": "cross-env NODE_ENV=development node src/deploy-command.js && cross-env NODE_ENV=development node src/app.js",
+    "dev:deploy": "cross-env NODE_ENV=development node src/deploy-command.js",
+    "dev:server": "cross-env NODE_ENV=development node src/app.js",
+    "dev:classTest": "node src/controller/Game.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@discordjs/rest": "^1.1.0",
+    "awilix": "^6.1.0",
+    "dayjs": "^1.11.5",
+    "discord.js": "14.3.0",
+    "dotenv": "^16.0.2",
+    "echarts": "^5.3.3",
+    "lodash": "^4.17.21",
+    "mongoose": "^6.6.1",
+    "sharp": "^0.30.7",
+    "winston": "^3.8.2",
+    "winston-daily-rotate-file": "^4.7.1"
+  },
+  "devDependencies": {
+    "@babel/cli": "^7.18.10",
+    "@babel/core": "^7.19.1",
+    "@babel/preset-env": "^7.19.1",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.23.1",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-config-prettier": "^8.5.0",
+    "eslint-plugin-import": "^2.26.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-sort-class-members": "^1.15.2",
+    "nodemon": "^2.0.20",
+    "prettier": "^2.7.1"
+  }
 }
